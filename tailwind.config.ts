@@ -1,16 +1,50 @@
 import type { Config } from "tailwindcss";
+const { fontFamily } = require("tailwindcss/defaultTheme");
 
 export default {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./src/**/*.{js,ts,jsx,tsx,mdx}", "./public/**/*.html"],
   theme: {
     extend: {
+      screens: {
+        xs: "480px",
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1280px",
+        "2xl": "1440px",
+        "3xl": "1920px",
+      },
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        black: {
+          DEFAULT: "#000000",
+        },
+        white: {
+          DEFAULT: "#ffffff",
+          50: "#EEEEEE",
+        },
+        blue: {
+          DEFAULT: "#3374EB",
+        },
+        gray: {
+          DEFAULT: "#B1A9A9",
+        },
+        orange: {
+          DEFAULT: "#FB8A05",
+        },
+        red: {
+          DEFAULT: "#C43232",
+        },
+        green: {
+          DEFAULT: "#11401C",
+          50: ''
+        },
+      },
+      fontFamily: {
+        poppins: ["Poppins", ...fontFamily.sans], 
+        circular: ["Circular Std", ...fontFamily.sans],
+      },
+      backgroundImage: {
+        'three-color-gradient': 'linear-gradient(to right, #11401C, #1F7332, #859B5B)',
       },
     },
   },

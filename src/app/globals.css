@@ -2,12 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@font-face {
+  font-family: "Circular Std";
+  src: url("/fonts/CircularStd-Book.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
 }
 
-@media (prefers-color-scheme: dark) {
+:root {
+  --font-poppins: "Poppins", sans-serif;
+  --font-circularStd: "Circular Std", sans-serif;
+}
+
+.btn-gradient-border {
+  background: linear-gradient(to right, #11401C, #1F7332, #859B5B);
+  padding: 2px;
+  border-radius: 9999px;
+  width: 537px;
+  height: 56px;
+}
+
+.btn-gradient-border button {
+  background: white;
+  border: none;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
@@ -18,4 +41,4 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
-}
+} */
