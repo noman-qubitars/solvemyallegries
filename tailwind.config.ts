@@ -17,16 +17,19 @@ export default {
       colors: {
         black: {
           DEFAULT: "#000000",
+          50: '#1918251A'
         },
         white: {
           DEFAULT: "#ffffff",
           50: "#EEEEEE",
+          100: ''
         },
         blue: {
           DEFAULT: "#3374EB",
         },
         gray: {
           DEFAULT: "#B1A9A9",
+          50: '#717171'
         },
         orange: {
           DEFAULT: "#FB8A05",

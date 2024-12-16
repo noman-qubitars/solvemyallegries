@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { FaApple } from "react-icons/fa";
 
 const Home: React.FC = () => {
 
@@ -44,6 +45,28 @@ const Home: React.FC = () => {
                 <p className="font-poppins font-normal text-[30px] leading-[48px] text-green pt-32 text-center">
                     Experience daily healing sessions, seamless communication with expert practitioners, personalized milestone tracking, an engaging reward system, and a complete history of your wellness journey—all in one app.
                 </p>
+                <div className="mt-[50px] flex gap-[48px] justify-center">
+                    <button className="bg-black px-3 py-2 flex gap-1 items-center rounded-lg">
+                        <FaApple className="text-white text-[35px]" />
+                        <div className="text-left">
+                            <p className="font-poppins text-[11.5px] font-normal text-white leading-3">Download on the</p>
+                            <p className="font-poppins text-[20px] font-medium text-white leading-6">App Store </p>
+                        </div>
+                    </button>
+                    <button className="bg-black px-3 py-2 flex gap-1 items-center rounded-lg">
+                        <Image
+                            src='/images/playstore.png'
+                            alt="admin"
+                            width={30}
+                            height={30}
+                            className="h-[30px] w-[30px]"
+                        />
+                        <div className="text-left">
+                            <p className="font-poppins text-[11.5px] font-normal text-white leading-3 uppercase">Get it on</p>
+                            <p className="font-poppins text-[20px] font-medium text-white leading-6">Google Play</p>
+                        </div>
+                    </button>
+                </div>
             </div>
             <Image
                 src='/images/hero_bg.svg'
@@ -52,7 +75,6 @@ const Home: React.FC = () => {
                 height={888}
                 className="h-[888px] w-[892px] absolute right-0 top-[6rem] z-0"
             />
-
         </div>
     );
 };

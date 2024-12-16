@@ -10,19 +10,18 @@ const Navbar: React.FC = () => {
 
     useEffect(() => {
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 0); // Check if the user has scrolled
+            setIsScrolled(window.scrollY > 0); 
         };
 
         window.addEventListener("scroll", handleScroll);
         return () => {
-            window.removeEventListener("scroll", handleScroll); // Cleanup on unmount
+            window.removeEventListener("scroll", handleScroll);
         };
     }, []);
 
     return (
-        // <nav className="container mx-auto flex justify-between items-center fixed top-5 left-0 right-0 z-20">
         <nav
-            className={`container mx-auto flex justify-between items-center fixed top-5 left-0 right-0 z-20 transition-all duration-300 ${isScrolled ? "bg-white shadow-lg" : "bg-transparent"
+            className={`container mx-auto flex justify-between items-center fixed top-5 left-0 right-0 z-20 transition-all duration-300 ${isScrolled ? "bg-white shadow-lg p-1.5 rounded-lg top-0" : "bg-transparent"
                 }`}
         >
             <div className="cursor-pointer">
