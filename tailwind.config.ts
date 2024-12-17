@@ -50,6 +50,7 @@ export default {
       },
       backgroundImage: {
         'text-gradient-green': 'linear-gradient(to right, #11401C, #1F7332, #859B5B)',
+        'text-gradient-green-one': 'linear-gradient( #11401C, #1F7332, #9DC03E)',
       },
     },
   },
