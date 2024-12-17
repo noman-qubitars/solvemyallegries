@@ -12,15 +12,15 @@ const Home: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <p className="text-green text-[64px] font-semibold font-poppins leading-[70px] max-w-[33rem]">
-                            The greatest investment you can make is in <u className="">Yourself</u>
+                            The greatest investment you can make is in <u  className="text-gradient-green">Yourself</u>
                         </p>
-                        <div className="btn-gradient-border mt-[81px]">
-                            <button className="h-[56px] w-[537px] font-bold text-[24px] text-center text-green font-poppins">
+                        <div className="btn-gradient-border mt-[81px] h-[56px] w-[537px] rounded-full">
+                            <button className="font-bold text-[24px] text-center text-green font-poppins">
                                 Get App Access
                             </button>
                         </div>
-                        <div className="btn-gradient-border mt-[30px]">
-                            <button className="h-[56px] w-[537px] font-bold text-[24px] text-center text-green font-poppins">
+                        <div className="btn-gradient-border mt-[30px] h-[56px] w-[537px] rounded-full">
+                            <button className="font-bold text-[24px] text-center text-green font-poppins">
                                 Watch Webinar
                             </button>
                         </div>

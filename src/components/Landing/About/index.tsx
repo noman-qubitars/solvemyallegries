@@ -10,30 +10,30 @@ import "slick-carousel/slick/slick-theme.css";
 const About: React.FC = () => {
 
     const settings = {
-        dots: false, // Show navigation dots
-        infinite: true, // Infinite loop
-        speed: 500, // Slide transition speed
-        slidesToShow: 4, // Show 4 cards per slide
-        slidesToScroll: 4, // Scroll 4 cards at a time
-        autoplay: true, // Autoplay slides
-        autoplaySpeed: 3000, // Duration per slide
+        dots: false,
+        infinite: true,
+        speed: 700,
+        slidesToShow: 4,
+        slidesToScroll: 4,
+        autoplay: true,
+        autoplaySpeed: 3000,
         responsive: [
             {
-                breakpoint: 1024, // For medium devices
+                breakpoint: 1024,
                 settings: {
                     slidesToShow: 3,
                     slidesToScroll: 3,
                 },
             },
             {
-                breakpoint: 768, // For small devices
+                breakpoint: 768,
                 settings: {
                     slidesToShow: 2,
                     slidesToScroll: 2,
                 },
             },
             {
-                breakpoint: 480, // For extra small devices
+                breakpoint: 480,
                 settings: {
                     slidesToShow: 1,
                     slidesToScroll: 1,
@@ -41,7 +41,6 @@ const About: React.FC = () => {
             },
         ],
     };
-
 
     return (
         <div className="mt-[70px]">
@@ -90,20 +89,11 @@ const About: React.FC = () => {
             </div>
             <div className="container mx-auto mt-4">
                 <p className="text-green font-poppins font-bold text-[44px]">How does This App Work?</p>
-                {/* <div className="flex justify-center mt-8">
-                    <Image
-                        src='/images/mockup.png'
-                        alt='mockup'
-                        width={532}
-                        height={1076}
-                        className=""
-                    />
-                </div> */}
-                <div className="flex justify-center mt-8">
+                <div className="flex justify-center">
                     <div className="relative">
                         {/* Image Mockup */}
                         <Image
-                            src='/images/mockup.png'
+                            src='/images/mockup.svg'
                             alt='mockup'
                             width={532}
                             height={1076}
@@ -111,7 +101,7 @@ const About: React.FC = () => {
                         />
 
                         {/* Motivational Quote */}
-                        <div className="absolute top-[8%] right-[-300px] text-green text-[32px] font-circular font-bold">
+                        <div className="absolute top-[13.5%] right-[-300px] text-green text-[32px] font-circular font-bold">
                             Motivational Quote
                         </div>
                         <Image
@@ -119,11 +109,11 @@ const About: React.FC = () => {
                             alt='mockup'
                             width={163}
                             height={95}
-                            className="absolute top-[13%] right-[-160px]"
+                            className="absolute top-[18%] right-[-110px]"
                         />
 
                         {/* Daily Mood Tracker */}
-                        <div className="absolute top-[18%] left-[-300px] text-green text-[32px] font-circular font-bold">
+                        <div className="absolute top-[24.5%] left-[-300px] text-green text-[32px] font-circular font-bold">
                             Daily Mood Tracker
                         </div>
                         <Image
@@ -131,11 +121,11 @@ const About: React.FC = () => {
                             alt='mockup'
                             width={163}
                             height={95}
-                            className="absolute top-[23%] left-[-160px]"
+                            className="absolute top-[29%] left-[-115px]"
                         />
 
                         {/* Symptom Tracker */}
-                        <div className="absolute top-[34.8%] right-[-370px] text-green text-[32px] font-circular font-bold">
+                        <div className="absolute top-[37%] right-[-335px] text-green text-[32px] font-circular font-bold">
                             Symptom Tracker
                         </div>
                         <Image
@@ -143,11 +133,11 @@ const About: React.FC = () => {
                             alt='mockup'
                             width={163}
                             height={95}
-                            className="absolute top-[35.5%] right-[-105px]"
+                            className="absolute top-[38%] right-[-70px]"
                         />
 
                         {/* Supplement Reminder */}
-                        <div className="absolute top-[46%] left-[-330px] text-green text-[32px] font-circular font-bold">
+                        <div className="absolute top-[45%] left-[-330px] text-green text-[32px] font-circular font-bold">
                             Supplement Reminder
                         </div>
                         <Image
@@ -155,11 +145,11 @@ const About: React.FC = () => {
                             alt='mockup'
                             width={163}
                             height={95}
-                            className="absolute top-[50.5%] left-[-155px]"
+                            className="absolute top-[49.5%] left-[-112px]"
                         />
 
                         {/* Session Tracker */}
-                        <div className="absolute bottom-[23%] left-[-250px] text-green text-[32px] font-circular font-bold">
+                        <div className="absolute bottom-[26.5%] left-[-250px] text-green text-[32px] font-circular font-bold">
                             Session Tracker
                         </div>
                         <Image
@@ -167,11 +157,11 @@ const About: React.FC = () => {
                             alt='mockup'
                             width={163}
                             height={95}
-                            className="absolute top-[68%] left-[-155px]"
+                            className="absolute top-[64.5%] left-[-112px]"
                         />
 
                         {/* Progress Level */}
-                        <div className="absolute bottom-[23.5%] right-[-280px] text-green text-[32px] font-circular font-bold">
+                        <div className="absolute bottom-[27%] right-[-280px] text-green text-[32px] font-circular font-bold">
                             Progress Level
                         </div>
                         <Image
@@ -179,11 +169,10 @@ const About: React.FC = () => {
                             alt='mockup'
                             width={163}
                             height={95}
-                            className="absolute top-[62.5%] right-[-155px]"
+                            className="absolute top-[59.8%] right-[-115px]"
                         />
                     </div>
                 </div>
-
             </div>
         </div>
     );

@@ -10,7 +10,7 @@ const Navbar: React.FC = () => {
 
     useEffect(() => {
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 0); 
+            setIsScrolled(window.scrollY > 0);
         };
 
         window.addEventListener("scroll", handleScroll);
@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
 
     return (
         <nav
-            className={`container mx-auto flex justify-between items-center fixed top-5 left-0 right-0 z-20 transition-all duration-300 ${isScrolled ? "bg-white shadow-lg p-1.5 rounded-lg top-0" : "bg-transparent"
+            className={`container mx-auto flex justify-between items-center fixed left-0 right-0 z-20 transition-all duration-300 ${isScrolled ? "bg-white shadow-lg p-1.5 rounded-lg top-0" : "bg-transparent top-5"
                 }`}
         >
             <div className="cursor-pointer">
