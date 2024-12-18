@@ -23,7 +23,7 @@ export default {
         white: {
           DEFAULT: "#ffffff",
           50: "#EEEEEE",
-          100: ''
+          100: '#F8F8F8'
         },
         blue: {
           DEFAULT: "#3374EB",
@@ -41,7 +41,12 @@ export default {
         },
         green: {
           DEFAULT: "#11401C",
-          50: '#9DC03E'
+          50: '#9DC03E',
+          100: '#B1D452',
+          150: '#35583D',
+          200: '#207C35',
+          250: '#F2FFF6',
+          300: '#92E3A9'
         },
       },
       fontFamily: {

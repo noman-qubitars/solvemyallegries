@@ -15,7 +15,7 @@
 }
 
 .btn-gradient-border {
-  background: linear-gradient(to right, #11401C, #1F7332, #859B5B);
+  background: linear-gradient(to right, #11401c, #1f7332, #859b5b);
   padding: 2px;
 }
 
@@ -30,6 +30,25 @@
 
 .text-gradient-green {
   @apply bg-text-gradient-green text-transparent bg-clip-text inline-block;
+}
+
+.gradient-border {
+  position: relative;
+  border-radius: 50px;
+  padding: 6px;
+  background-clip: padding-box;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  background: linear-gradient(to right, #e3e3e3 41%, #ffffff 43%);
+  z-index: -1;
+  border-radius: 50px;
 }
 
 /* @media (prefers-color-scheme: dark) {
