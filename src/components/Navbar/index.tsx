@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 import Solve from "@/icons/Solve";
 
 const Navbar: React.FC = () => {
 
+    const router = useRouter();
     const [isScrolled, setIsScrolled] = useState(false);
 
     useEffect(() => {
@@ -24,7 +26,7 @@ const Navbar: React.FC = () => {
             className={`container mx-auto flex justify-between items-center fixed left-0 right-0 z-20 transition-all duration-300 ${isScrolled ? "bg-white shadow-lg p-1.5 rounded-lg top-0" : "bg-transparent top-5"
                 }`}
         >
-            <div className="cursor-pointer">
+            <div className="cursor-pointer" onClick={() => router.push('/')}>
                 <Solve />
             </div>
             <div className="flex items-center gap-[4rem]">
@@ -41,7 +43,7 @@ const Navbar: React.FC = () => {
                     Contact
                 </Link>
             </div>
-            <button className="font-poppins font-extrabold text-white-50 w-[179px] h-[45px] rounded-full bg-green">
+            <button className="font-poppins font-extrabold text-white-50 w-[179px] h-[45px] rounded-full bg-green" onClick={() => router.push('/webinar')}>
                 Watch Webinar
             </button>
         </nav>
