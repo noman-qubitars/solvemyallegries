@@ -5,8 +5,6 @@ import Image from "next/image";
 import { GoPerson } from "react-icons/go";
 import { MdOutlineMail } from "react-icons/md";
 
-
-
 const Subscription: React.FC = () => {
     return (
         <div className="relative">
