@@ -7,12 +7,13 @@ import Quote_top from "../../../public/images/quote_white_top.svg";
 import Quote_bottom from "../../../public/images/quote_white_bottom.svg";
 import { BsArrowUpRight } from "react-icons/bs";
 import Case from "../../../public/images/case.svg";
+import Case_one from "../../../public/images/case_one.svg";
+import Case_two from "../../../public/images/case_two.svg";
 import Quote from "../../../public/images/quote.svg";
 import Star from "../../../public/images/star.svg";
 import Person from "../../../public/images/test.svg";
 import Person_one from "../../../public/images/test_one.svg";
 import Person_two from "../../../public/images/test_two.svg";
-import { IoIosArrowForward } from "react-icons/io";
 
 
 export interface Landing {
@@ -189,7 +190,7 @@ export const casestudy: CaseStudy[] = [
         "He experienced a noticeable reduction in symptoms, allowing him to breathe freely and focus better at work.",
     },
     review: {
-      image: Case,
+      image: Case_one,
       view: "View detail",
       vector: BsArrowUpRight,
       person: "JAMES'S REVIEW",
@@ -242,7 +243,7 @@ export const casestudy: CaseStudy[] = [
         "He experienced a noticeable reduction in symptoms, allowing him to breathe freely and focus better at work.",
     },
     review: {
-      image: Case,
+      image: Case_two,
       view: "View detail",
       vector: BsArrowUpRight,
       person: "JAMES'S REVIEW",
@@ -301,7 +302,6 @@ export const testimonials: Testimonials[] = [
 export interface FAQ {
   id: string;
   title: string;
-  vector: React.FC;
   subtitle: string;
   desp: string;
 }
@@ -310,56 +310,48 @@ export const faq: FAQ[] = [
   {
     id: "1",
     title: 'What is the SaveMyAllergies app about?',
-    vector: IoIosArrowForward,
     subtitle: 'What is a SolveMyAllergies App about?',
     desp: 'SaveMyAllergies provides personalized tools, sessions, and support to help manage allergies and improve wellness through practitioner guidance.'
   },
   {
     id: "2",
     title: 'How do I start using SaveMyAllergies?',
-    vector: IoIosArrowForward,
     subtitle: 'What is a SolveMyAllergies App abouts?',
     desp: 'SaveMyAllergies provides personalized tools, sessions, and support to help manage allergies and improve wellness through practitioner guidance.'
   },
   {
     id: "3",
     title: 'What is included in the personalized healing program?',
-    vector: IoIosArrowForward,
     subtitle: 'What is a SolveMyAllergies App about?',
     desp: 'SaveMyAllergies provides personalized tools, sessions, and support to help manage allergies and improve wellness through practitioner guidance.'
   },
   {
     id: "4",
     title: 'Can I directly contact with my practitioner?',
-    vector: IoIosArrowForward,
     subtitle: 'What is a SolveMyAllergies App about?',
     desp: 'SaveMyAllergies provides personalized tools, sessions, and support to help manage allergies and improve wellness through practitioner guidance.'
   },
   {
     id: "5",
     title: 'What types of purchases are recommended in the app?',
-    vector: IoIosArrowForward,
     subtitle: 'What is a SolveMyAllergies App about?',
     desp: 'SaveMyAllergies provides personalized tools, sessions, and support to help manage allergies and improve wellness through practitioner guidance.'
   },
   {
     id: "6",
     title: 'How are rewards unlocked in App?',
-    vector: IoIosArrowForward,
     subtitle: 'What is a SolveMyAllergies App about?',
     desp: 'SaveMyAllergies provides personalized tools, sessions, and support to help manage allergies and improve wellness through practitioner guidance.'
   },
   {
     id: "7",
     title: 'Are my personal and medical details secure?',
-    vector: IoIosArrowForward,
     subtitle: 'What is a SolveMyAllergies App about?',
     desp: 'SaveMyAllergies provides personalized tools, sessions, and support to help manage allergies and improve wellness through practitioner guidance.'
   },
   {
     id: "8",
     title: 'How can I track my progress',
-    vector: IoIosArrowForward,
     subtitle: 'What is a SolveMyAllergies App about?',
     desp: 'SaveMyAllergies provides personalized tools, sessions, and support to help manage allergies and improve wellness through practitioner guidance.'
   },

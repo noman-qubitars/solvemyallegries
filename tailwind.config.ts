@@ -31,7 +31,10 @@ export default {
         gray: {
           DEFAULT: "#B1A9A9",
           50: '#717171',
-          100: '#B1A9A9'
+          100: '#B1A9A9',
+          150: '#484C52',
+          200: '#787E8C',
+          250: '#5B6674'
         },
         orange: {
           DEFAULT: "#FB8A05",

@@ -18,7 +18,7 @@ const Case: React.FC = () => {
         autoplay: true,
         autoplaySpeed: 3000,
         centerMode: true,
-        centerPadding: "15%",
+        centerPadding: "16%",
         arrows: false,
     };
 

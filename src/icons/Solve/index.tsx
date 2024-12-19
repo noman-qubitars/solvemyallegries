@@ -6,7 +6,7 @@ interface Props {
     height?: string;
 }
 
-const Solve: React.FC<Props> = ({ width = "222", height = "45" }) => {
+const Solve: React.FC<Props> = ({ width = "256", height = "48" }) => {
     return (
         <svg xmlns="http://www.w3.org/2000/svg"
             width={width}
