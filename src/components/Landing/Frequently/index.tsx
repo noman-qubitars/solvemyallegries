@@ -9,7 +9,7 @@ const Frequently: React.FC = () => {
     const [activeId, setActiveId] = useState<string>("1");
 
     return (
-        <div className="container mx-auto mt-[30px]">
+        <div className="container mx-auto mt-[30px]" id="faqs-section">
             <p className="font-poppins font-extrabold text-[48px] text-green" style={{ boxShadow: "#00000040" }}>
                 Frequenlty Asked Questions
             </p>

@@ -96,7 +96,7 @@ const Features: React.FC = () => {
                 {/* Background Section */}
                 <div className="h-[511px] w-full bg-[url('/images/feature_bg.svg')] bg-cover bg-center mt-[490px]" />
             </div>
-            <div className="container mx-auto mt-[26rem]">
+            <div className="container mx-auto mt-[26rem]" id="contact-section">
                 <div className="grid grid-cols-2 gap-3">
                     <div>
                         <Image

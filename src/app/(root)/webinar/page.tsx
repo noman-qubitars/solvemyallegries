@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from 'react'
-import Navbar from '@/components/Navbar';
+import Layout from '@/components/Layout';
 import Webinar from '@/components/Webinar';
-import Footer from '@/components/Footer';
 import { IoIosArrowUp } from "react-icons/io";
 
 const WebinardPage: React.FC = () => {
@@ -30,10 +29,8 @@ const WebinardPage: React.FC = () => {
     };
 
     return (
-        <div>
-            <Navbar />
+        <Layout>
             <Webinar />
-            <Footer />
 
             {isVisible && (
                 <button
@@ -44,7 +41,7 @@ const WebinardPage: React.FC = () => {
                 </button>
             )
             }
-        </div>
+        </Layout>
     )
 }
 

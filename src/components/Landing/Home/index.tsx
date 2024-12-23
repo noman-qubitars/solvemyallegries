@@ -7,7 +7,7 @@ import { FaApple } from "react-icons/fa";
 const Home: React.FC = () => {
 
     return (
-        <div className="relative pt-[160px]">
+        <div className="relative pt-[160px]" id="home-section">
             <div className="container mx-auto">
                 <div className="grid grid-cols-2 gap-4">
                     <div>

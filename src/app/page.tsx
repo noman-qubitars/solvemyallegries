@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import Navbar from "@/components/Navbar";
+import Layout from '@/components/Layout';
 import HomePage from "@/components/Landing/Home";
 import AboutPage from "@/components/Landing/About";
 import FeaturesPage from "@/components/Landing/Features";
 import CasePage from "@/components/Landing/Case";
 import TestimonialPage from "@/components/Landing/Testimonial";
 import FrequentlyPage from "@/components/Landing/Frequently";
-import Footer from "@/components/Footer";
 import { IoIosArrowUp } from "react-icons/io";
 
 
@@ -36,15 +35,13 @@ export default function Home() {
   };
 
   return (
-    <div>
-      <Navbar />
+    <Layout>
       <HomePage />
       <AboutPage />
       <FeaturesPage />
       <CasePage />
       <TestimonialPage />
       <FrequentlyPage />
-      <Footer />
 
       {isVisible && (
         <button
@@ -55,6 +52,6 @@ export default function Home() {
         </button>
       )
       }
-    </div>
+    </Layout>
   );
 }

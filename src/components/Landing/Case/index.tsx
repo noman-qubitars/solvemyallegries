@@ -2,12 +2,17 @@
 
 import React from "react";
 import Image from "next/image";
+import { redirect } from 'next/navigation'
 import { casestudy } from "@/data/Landing";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 const Case: React.FC = () => {
+
+    const handleItemClick = (id: string) => {
+        redirect(`/casestudy/${id}`)
+    };
 
     const settings = {
         dots: false,
@@ -29,7 +34,7 @@ const Case: React.FC = () => {
             </p>
             <Slider {...settings}>
                 {casestudy.map((item) => (
-                    <div key={item.id} className="mt-[44px] px-4">
+                    <div key={item.id} className="mt-[44px] px-4 cursor-pointer" onClick={() => handleItemClick(item.id)}>
                         {/* CHALLENGES */}
                         <div className="bg-green-50 py-[38px] pl-[24px] rounded-lg">
                             <div className="flex gap-[20px] items-center">
@@ -67,11 +72,11 @@ const Case: React.FC = () => {
                             </div>
                             {/* IMPACT & OUTCOME */}
                             <div className="flex justify-between flex-col w-[300px]">
-                                <div className="bg-green-100 py-[21px] px-[28px] rounded-lg">
+                                <div className="bg-green-100 py-[21px] px-[28px] rounded-lg h-[10.5rem]">
                                     <h4 className="font-bold font-poppins text-black-100">{item.impact.title}</h4>
                                     <p className="mt-[17px] font-poppins font-normal text-[14px] text-black-100">{item.impact.description}</p>
                                 </div>
-                                <div className="btn-gradient-border rounded-lg">
+                                <div className="btn-gradient-border rounded-lg h-[10.5rem]">
                                     <div className="px-[28px] py-[21px]">
                                         <h4 className="font-bold font-poppins text-black-100" style={{ boxShadow: "#00000040" }}>{item.outcome.title}</h4>
                                         <p>{item.outcome.description}</p>
@@ -79,7 +84,7 @@ const Case: React.FC = () => {
                                 </div>
                             </div>
                             {/* REVIEW */}
-                            <div className="bg-text-gradient-green-one opacity-90 pr-[28px] w-[430px] rounded-3xl relative">
+                            <div className="bg-custom-green-gradient pr-[28px] w-[430px] rounded-3xl relative">
                                 <Image
                                     src={item.review.image}
                                     alt="review"
@@ -103,20 +108,20 @@ const Case: React.FC = () => {
                                         height={164}
                                         className="absolute w-[40px] left-[55px] top-[-25px]"
                                     />
-                                    <h4 className="text-lg font-bold text-center text-white mt-[120px]">{item.review.person}</h4>
+                                    <h4 className="text-lg font-bold text-center text-white mt-[140px]">{item.review.person}</h4>
                                     <div className="flex justify-center">
-                                        <div className=" max-w-[300px]">
+                                        <div className="max-w-[330px]">
                                             <p className="text-center text-white">{item.review.quote}</p>
                                         </div>
                                     </div>
-                                    <Image
-                                        src={item.review.imagetwo}
-                                        alt="review"
-                                        width={163}
-                                        height={164}
-                                        className="absolute w-[40px] right-[30px] bottom-[-75px]"
-                                    />
                                 </div>
+                                <Image
+                                    src={item.review.imagetwo}
+                                    alt="review"
+                                    width={163}
+                                    height={164}
+                                    className="absolute w-[40px] right-[30px] bottom-[-10px]"
+                                />
                             </div>
                         </div>
                     </div>

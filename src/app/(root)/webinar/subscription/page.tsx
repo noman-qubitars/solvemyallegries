@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from 'react'
-import Navbar from '@/components/Navbar';
+import Layout from '@/components/Layout';
 import Subscription from '@/components/Subscription';
-import Footer from '@/components/Footer';
 import { IoIosArrowUp } from "react-icons/io";
 
 const SubscriptionPage: React.FC = () => {
@@ -30,10 +29,8 @@ const SubscriptionPage: React.FC = () => {
     };
 
     return (
-        <div>
-            <Navbar />
+        <Layout>
             <Subscription />
-            <Footer />
 
             {isVisible && (
                 <button
@@ -44,7 +41,7 @@ const SubscriptionPage: React.FC = () => {
                 </button>
             )
             }
-        </div>
+        </Layout>
     )
 }
 

@@ -43,7 +43,7 @@ const About: React.FC = () => {
     };
 
     return (
-        <div className="mt-[70px]">
+        <div id="feature-section" className="mt-[70px]">
             <p className="text-center font-poppins font-bold text-[44px] text-green">
                 App Features
             </p>
