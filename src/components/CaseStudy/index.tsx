@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { StaticImageData } from "next/image";
 import Image from "next/image";
 import { BsArrowUpRight } from "react-icons/bs";
