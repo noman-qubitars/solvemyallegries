@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import HomePage from "@/components/Landing/Home";
-// import AboutPage from "@/components/Landing/About";
-// import FeaturesPage from "@/components/Landing/Features";
-// import CasePage from "@/components/Landing/Case";
-// import TestimonialPage from "@/components/Landing/Testimonial";
-// import FrequentlyPage from "@/components/Landing/Frequently";
+import AboutPage from "@/components/Landing/About";
+import FeaturesPage from "@/components/Landing/Features";
+import CasePage from "@/components/Landing/Case";
+import TestimonialPage from "@/components/Landing/Testimonial";
+import FrequentlyPage from "@/components/Landing/Frequently";
 import { IoIosArrowUp } from "react-icons/io";
 
 
@@ -37,11 +37,11 @@ export default function Home() {
   return (
     <Layout>
       <HomePage />
-      {/* <AboutPage /> */}
-      {/* <FeaturesPage /> */}
-      {/* <CasePage /> */}
-      {/* <TestimonialPage /> */}
-      {/* <FrequentlyPage /> */}
+      <AboutPage />
+      <FeaturesPage />
+      <CasePage />
+      <TestimonialPage />
+      <FrequentlyPage />
 
       {isVisible && (
         <button

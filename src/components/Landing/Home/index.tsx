@@ -42,15 +42,15 @@ const Home: React.FC = () => {
                         />
                     </div>
                 </div>
-                <p className="font-poppins font-normal text-[30px] leading-[48px] text-green pt-32 text-center">
+                <p className="font-poppins font-normal text-[24px] sm:text-[30px] leading-[38px] sm:leading-[48px] text-green pt-32 text-center">
                     Experience daily healing sessions, seamless communication with expert practitioners, personalized milestone tracking, an engaging reward system, and a complete history of your wellness journey—all in one app.
                 </p>
-                <div className="mt-[50px] flex gap-[48px] justify-center">
+                <div className="mt-[50px] flex gap-[30px] sm:gap-[48px] justify-center">
                     <button className="bg-black px-3 py-2 flex gap-1 items-center rounded-lg">
-                        <FaApple className="text-white text-[35px]" />
+                        <FaApple className="text-white text-[30px] sm:text-[35px]" />
                         <div className="text-left">
-                            <p className="font-poppins text-[11.5px] font-normal text-white leading-3">Download on the</p>
-                            <p className="font-poppins text-[20px] font-medium text-white leading-6">App Store </p>
+                            <p className="font-poppins text-[10px] sm:text-[11.5px] font-normal text-white leading-3">Download on the</p>
+                            <p className="font-poppins text-[18px] sm:text-[20px] font-medium text-white leading-6">App Store </p>
                         </div>
                     </button>
                     <button className="bg-black px-3 py-2 flex gap-1 items-center rounded-lg">
@@ -59,11 +59,11 @@ const Home: React.FC = () => {
                             alt="admin"
                             width={30}
                             height={30}
-                            className="h-[30px] w-[30px]"
+                            className="sm:h-[30px] sm:w-[30px] w-[28px] h-[28px]"
                         />
                         <div className="text-left">
-                            <p className="font-poppins text-[11.5px] font-normal text-white leading-3 uppercase">Get it on</p>
-                            <p className="font-poppins text-[20px] font-medium text-white leading-6">Google Play</p>
+                            <p className="font-poppins text-[10px] sm:text-[11.5px] font-normal text-white leading-3 uppercase">Get it on</p>
+                            <p className="font-poppins text-[18px] sm:text-[20px] font-medium text-white leading-6">Google Play</p>
                         </div>
                     </button>
                 </div>

@@ -119,7 +119,7 @@ const Navbar: React.FC = () => {
                     ></div>
                     <div
                         ref={modalRef}
-                        className={`fixed right-0 top-0 bg-white z-40 w-[393px] h-screen pt-[1.25rem] px-[1.25rem] transition-transform duration-300 ${modalClass === "open"
+                        className={`fixed right-0 top-0 bg-white z-40 w-[375px] sm:w-[393px] h-screen pt-[1.25rem] px-[1.25rem] transition-transform duration-300 ${modalClass === "open"
                             ? "translate-x-0"
                             : modalClass === "closing"
                                 ? "translate-x-full"
