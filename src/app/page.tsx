@@ -37,11 +37,11 @@ export default function Home() {
   return (
     <Layout>
       <HomePage />
-      <AboutPage />
-      <FeaturesPage />
-      <CasePage />
-      <TestimonialPage />
-      <FrequentlyPage />
+      {/* <AboutPage /> */}
+      {/* <FeaturesPage /> */}
+      {/* <CasePage /> */}
+      {/* <TestimonialPage /> */}
+      {/* <FrequentlyPage /> */}
 
       {isVisible && (
         <button

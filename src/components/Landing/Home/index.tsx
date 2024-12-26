@@ -9,36 +9,36 @@ const Home: React.FC = () => {
     return (
         <div className="relative pt-[160px]" id="home-section">
             <div className="container mx-auto">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-12 lg:gap-4">
                     <div>
-                        <p className="text-green text-[64px] font-semibold font-poppins leading-[70px] max-w-[33rem]">
-                            The greatest investment you can make is in <u  className="text-gradient-green">Yourself</u>
+                        <p className="text-green text-[64px] font-semibold font-poppins leading-[70px] w-full sm:max-w-[33rem]">
+                            The greatest investment you can make is in <u className="text-gradient-green">Yourself</u>
                         </p>
-                        <div className="btn-gradient-border mt-[81px] h-[56px] w-[537px] rounded-full">
+                        <div className="btn-gradient-border mt-[81px] h-[56px] w-full sm:w-[450px] xl:w-[537px] rounded-full">
                             <button className="font-bold text-[24px] text-center text-green font-poppins">
                                 Get App Access
                             </button>
                         </div>
-                        <div className="btn-gradient-border mt-[30px] h-[56px] w-[537px] rounded-full">
+                        <div className="btn-gradient-border mt-[30px] h-[56px] w-full sm:w-[450px] xl:w-[537px] rounded-full">
                             <button className="font-bold text-[24px] text-center text-green font-poppins">
                                 Watch Webinar
                             </button>
                         </div>
                     </div>
-                    <div className="flex justify-center relative">
+                    <div className="flex pl-[8rem] sm:pl-[12rem] md:pl-[18rem] lg:pl-0 lg:justify-center relative">
                         <Image
                             src='/images/iphone.png'
                             alt="admin"
                             width={463}
                             height={936}
-                            className="h-[700px] w-[463px] z-10 relative"
+                            className="sm:h-[700px] h-[450px] w-[230px] sm:w-[400px] lg:w-[400px] xl:w-[463px] z-10 relative"
                         />
                         <Image
                             src='/images/hero.png'
                             alt="admin"
                             width={395}
                             height={345}
-                            className="h-[345px] w-[395px] absolute top-[22.5rem] -left-[130px] z-10"
+                            className="sm:h-[345px] h-[200px] w-[150px] sm:w-[280px] md:w-[350px] lg:w-[395px] absolute top-[15.5rem] sm:top-[22.5rem] left-[18px] sm:-left-[1px] md:left-[40px] lg:-left-[130px] z-10"
                         />
                     </div>
                 </div>
@@ -73,7 +73,7 @@ const Home: React.FC = () => {
                 alt="admin"
                 width={892}
                 height={888}
-                className="h-[888px] w-[892px] absolute right-0 top-[6rem] z-0"
+                className="h-[670px] sm:h-[800px] lg:h-[888px] w-[400px] sm:w-[650px] lg:w-[500px] xl:w-[780px] 2xl:w-[892px] absolute right-0 top-[43rem] sm:top-[43rem] lg:top-[6rem] z-0"
             />
         </div>
     );
