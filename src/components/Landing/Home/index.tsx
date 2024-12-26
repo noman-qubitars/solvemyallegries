@@ -73,7 +73,7 @@ const Home: React.FC = () => {
                 alt="admin"
                 width={892}
                 height={888}
-                className="h-[670px] sm:h-[800px] lg:h-[888px] w-[400px] sm:w-[650px] lg:w-[500px] xl:w-[780px] 2xl:w-[892px] absolute right-0 top-[43rem] sm:top-[43rem] lg:top-[6rem] z-0"
+                className="h-[670px] sm:h-[800px] lg:h-[888px] w-[400px] sm:w-[650px] lg:w-[500px] xl:w-[780px] 2xl:w-[892px] absolute right-0 top-[46rem] sm:top-[43rem] lg:top-[6rem] z-0"
             />
         </div>
     );
