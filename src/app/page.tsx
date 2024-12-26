@@ -45,7 +45,7 @@ export default function Home() {
 
       {isVisible && (
         <button
-          className="fixed bottom-20 z-40 sm:bottom-20 md:bottom-8 right-8 p-3 bg-green text-white rounded-full shadow-lg transition-all duration-300 ease-in-out"
+          className="fixed bottom-20 z-40 hidden sm:block sm:bottom-20 md:bottom-8 right-8 p-3 bg-green text-white rounded-full shadow-lg transition-all duration-300 ease-in-out"
           onClick={scrollToTop}
         >
           <IoIosArrowUp />
