@@ -11,7 +11,7 @@ const Home: React.FC = () => {
             <div className="container mx-auto">
                 <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-12 lg:gap-4">
                     <div className="px-2 sm:px-0">
-                        <p className="text-green text-[50px] sm:text-[64px] font-semibold font-poppins leading-[50px] sm:leading-[70px] max-w-full sm:max-w-[33rem]">
+                        <p className="text-green text-[50px] sm:text-[64px] font-semibold font-poppins leading-[55px] sm:leading-[70px] max-w-full sm:max-w-[33rem]">
                             The greatest investment you can make is in <u className="text-gradient-green">Yourself</u>
                         </p>
                         <div className="btn-gradient-border mt-[50px] sm:mt-[81px] h-[56px] w-full sm:w-[450px] xl:w-[537px] rounded-full">
@@ -73,7 +73,7 @@ const Home: React.FC = () => {
                 alt="admin"
                 width={892}
                 height={888}
-                className="h-[670px] sm:h-[800px] lg:h-[888px] w-[360px] sm:w-[650px] lg:w-[500px] xl:w-[780px] 2xl:w-[892px] absolute right-0 top-[31rem] sm:top-[43rem] lg:top-[6rem] z-0"
+                className="h-[700px] sm:h-[800px] lg:h-[888px] w-[360px] sm:w-[650px] lg:w-[500px] xl:w-[780px] 2xl:w-[892px] absolute right-0 top-[31rem] sm:top-[43rem] lg:top-[6rem] z-0"
             />
         </div>
     );
