@@ -41,7 +41,7 @@ const Testimonial: React.FC = () => {
                             }`}
                     >
                         <div
-                            className={`bg-white-100 rounded-[50px] py-[41px] px-[38px] shadow-lg ${currentSlide === index ? "shadow-3xl" : "shadow-md mt-12"
+                            className={`bg-white-100 rounded-[50px] py-[14px] px-[14px] sm:py-[21px] sm:px-[25px] md:py-[41px] md:px-[38px] shadow-lg ${currentSlide === index ? "shadow-3xl" : "shadow-md mt-12"
                                 } relative`}
                         >
                             {/* Center Border */}
@@ -52,7 +52,7 @@ const Testimonial: React.FC = () => {
                                         alt="review"
                                         width={36}
                                         height={26}
-                                        className="w-[36px] h-[26px]"
+                                        className="w-[20px] h-[20px] sm:w-[30px] sm:h-[20px] md:w-[36px] md:h-[26px]"
                                     />
                                     <div className="flex items-center gap-2">
                                         <Image
@@ -60,19 +60,19 @@ const Testimonial: React.FC = () => {
                                             alt="review"
                                             width={140}
                                             height={28}
-                                            className="w-[140px] h-[28px]"
+                                            className="w-[50px] h-[20px] sm:w-[120px] sm:h-[20px] md:w-[140px] md:h-[28px]"
                                         />
                                         <div className="flex items-center gap-1">
-                                            <p className="font-poppins font-semibold text-[20px] text-green-150">
+                                            <p className="font-poppins font-semibold text-[15px] sm:text-[16px] md:text-[20px] text-green-150">
                                                 {item.ranking}
                                             </p>
-                                            <p className="font-poppins font-normal text-green-150">
+                                            <p className="font-poppins font-normal text-green-150 text-[11px] sm:text-[14px] md:text-[16px]">
                                                 {item.rating}
                                             </p>
                                         </div>
                                     </div>
                                 </div>
-                                <p className="font-poppins font-light italic leading-[38px] text-green-200 mt-[8px] text-center">
+                                <p className="font-poppins font-light italic text-[13px] sm:text-[14px] md:text-[16px] leading-[20px] sm:leading-[25px] md:leading-[38px] text-green-200 mt-[8px] text-center">
                                     {item.desp}
                                 </p>
                                 <div className="flex justify-center flex-col items-center gap-3 mt-[14px]">
@@ -81,9 +81,9 @@ const Testimonial: React.FC = () => {
                                         alt="review"
                                         width={80}
                                         height={77}
-                                        className="w-[80px] h-[77px]"
+                                        className="w-[60px] h-[60px] sm:w-[70px] sm:h-[65px] md:w-[80px] md:h-[77px]"
                                     />
-                                    <p className="font-poppins text-[19px] font-medium text-center text-gray-50">
+                                    <p className="font-poppins text-[14px] sm:text-[16px] md:text-[19px] font-medium text-center text-gray-50">
                                         {item.author}
                                     </p>
                                 </div>
