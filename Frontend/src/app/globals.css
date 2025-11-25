@@ -1,0 +1,141 @@
+@import 'tailwindcss';
+
+@theme {
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1440px;
+  --breakpoint-3xl: 1920px;
+
+  --color-black-50: #1918251a;
+  --color-black-100: #222222;
+  --color-black: #000000;
+
+  --color-white-50: #eeeeee;
+  --color-white-100: #f8f8f8;
+  --color-white: #ffffff;
+
+  --color-blue: #3374eb;
+
+  --color-gray-50: #717171;
+  --color-gray-100: #b1a9a9;
+  --color-gray-150: #484c52;
+  --color-gray-200: #787e8c;
+  --color-gray-250: #5b6674;
+  --color-gray: #b1a9a9;
+
+  --color-orange: #fb8a05;
+
+  --color-red: #c43232;
+
+  --color-green-50: #9dc03e;
+  --color-green-100: #b1d452;
+  --color-green-150: #35583d;
+  --color-green-200: #207c35;
+  --color-green-250: #f2fff6;
+  --color-green-300: #92e3a9;
+  --color-green: #11401c;
+
+  --font-poppins:
+    Poppins, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-circular:
+    Circular Std, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+  --background-image-text-gradient-green: linear-gradient(
+    to right,
+    #11401c,
+    #1f7332,
+    #859b5b
+  );
+  --background-image-custom-green-gradient: linear-gradient(
+    to right,
+    #1f7332,
+    #9dc03e,
+    #11401c
+  );
+  --background-image-text-gradient-green-one: linear-gradient(
+    #11401c,
+    #1f7332,
+    #9dc03e
+  );
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@font-face {
+  font-family: "Circular Std";
+  src: url("/fonts/CircularStd-Book.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --font-poppins: "Poppins", sans-serif;
+  --font-circularStd: "Circular Std", sans-serif;
+}
+
+.btn-gradient-border {
+  background: linear-gradient(to right, #11401c, #1f7332, #859b5b);
+  padding: 2px;
+}
+
+.btn-gradient-border button,
+.btn-gradient-border div {
+  background: white;
+  border: none;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.text-gradient-green {
+  @apply bg-text-gradient-green text-transparent bg-clip-text inline-block;
+}
+
+.gradient-border {
+  position: relative;
+  border-radius: 50px;
+  padding: 6px;
+  background-clip: padding-box;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  background: linear-gradient(to right, #e3e3e3 41%, #ffffff 43%);
+  z-index: -1;
+  border-radius: 50px;
+}
+
+video::-webkit-media-controls {
+  display: none !important;
+}
+
+video::-moz-media-controls {
+  display: none !important;
+}
+
+video::-ms-media-controls {
+  display: none !important;
+}
+
+.scrollbar-hide {
+  scrollbar-width: thin;
+  scrollbar-color: #11401C transparent;
+}
