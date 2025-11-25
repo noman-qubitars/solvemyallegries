@@ -1,16 +1,16 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { config } from "../config/env";
-import { User } from "../models/User";
-import { Subscription } from "../models/Subscription";
+import { Admin } from "../models/Admin";
 import { OtpToken } from "../models/OtpToken";
 import { sendOtpEmail } from "./mailService";
 
 const SALT_ROUNDS = 10;
 const OTP_LENGTH = 4;
+const ADMIN_EMAIL = "nomanshabbir10@gmail.com";
 
-const createToken = (userId: string) => {
-  return jwt.sign({ sub: userId }, config.jwtSecret, { expiresIn: "1h" });
+const createToken = (adminId: string) => {
+  return jwt.sign({ sub: adminId, role: "admin" }, config.jwtSecret, { expiresIn: "1h" });
 };
 
 const generateOtpCode = () => {
@@ -19,26 +19,26 @@ const generateOtpCode = () => {
   return Math.floor(Math.random() * (max - min + 1) + min).toString();
 };
 
-const createOtpRecord = async (userId: string, code: string) => {
+const createOtpRecord = async (adminId: string, code: string) => {
   const hashedCode = await bcrypt.hash(code, SALT_ROUNDS);
   const expiresAt = new Date(Date.now() + 2 * 60 * 1000);
   return OtpToken.create({
     code: hashedCode,
     expiresAt,
-    userId
+    userId: adminId
   });
 };
 
-const getValidOtp = async (userId: string, code: string) => {
+const getValidOtp = async (adminId: string, code: string) => {
   const now = new Date();
   const record = await OtpToken.findOne({
-    userId,
+    userId: adminId,
     used: false,
     expiresAt: { $gt: now }
   }).sort({ createdAt: -1 });
   if (!record) {
     const expiredRecord = await OtpToken.findOne({
-      userId,
+      userId: adminId,
       used: false
     }).sort({ createdAt: -1 });
     if (expiredRecord) {
@@ -53,10 +53,10 @@ const getValidOtp = async (userId: string, code: string) => {
   return record;
 };
 
-const getLatestUnusedOtp = async (userId: string) => {
+const getLatestUnusedOtp = async (adminId: string) => {
   const now = new Date();
   const verifiedRecord = await OtpToken.findOne({
-    userId,
+    userId: adminId,
     used: false,
     verified: true
   }).sort({ verifiedAt: -1 });
@@ -74,7 +74,7 @@ const getLatestUnusedOtp = async (userId: string) => {
   }
   
   const unexpiredRecord = await OtpToken.findOne({
-    userId,
+    userId: adminId,
     used: false,
     expiresAt: { $gt: now }
   }).sort({ createdAt: -1 });
@@ -86,58 +86,43 @@ const getLatestUnusedOtp = async (userId: string) => {
   throw new Error("No verified OTP found. Please verify OTP first");
 };
 
-
-export const signin = async (payload: { email: string; password: string }) => {
-  let subscription = await Subscription.findOne({ email: payload.email });
-  let user = null;
-  
-  if (!subscription) {
-    user = await User.findOne({ email: payload.email });
-  }
-  
-  if (!subscription && !user) {
+export const adminSignin = async (payload: { email: string; password: string }) => {
+  if (payload.email !== ADMIN_EMAIL) {
     throw new Error("Your email is wrong");
   }
   
-  const account = subscription || user;
-  if (!account) {
+  const admin = await Admin.findOne({ email: ADMIN_EMAIL });
+  if (!admin) {
     throw new Error("Your email is wrong");
   }
   
-  const isValid = await bcrypt.compare(payload.password, account.password);
+  const isValid = await bcrypt.compare(payload.password, admin.password);
   if (!isValid) {
     throw new Error("Your password is wrong");
   }
   
-  const userId = account._id.toString();
+  const adminId = admin._id.toString();
   return { 
     success: true,
-    token: createToken(userId), 
-    userId: userId,
+    token: createToken(adminId), 
+    adminId: adminId,
     email: payload.email
   };
 };
 
-export const requestPasswordReset = async (email: string) => {
-  let subscription = await Subscription.findOne({ email });
-  let user = null;
-  
-  if (!subscription) {
-    user = await User.findOne({ email });
+export const adminRequestPasswordReset = async (email: string) => {
+  if (email !== ADMIN_EMAIL) {
+    throw new Error("Only admin email is allowed");
   }
   
-  if (!subscription && !user) {
+  const admin = await Admin.findOne({ email: ADMIN_EMAIL });
+  if (!admin) {
     throw new Error("Email not found. Please check your email address");
   }
   
-  const account = subscription || user;
-  if (!account) {
-    throw new Error("Email not found. Please check your email address");
-  }
-  
-  const userId = account._id.toString();
+  const adminId = admin._id.toString();
   const otp = generateOtpCode();
-  await createOtpRecord(userId, otp);
+  await createOtpRecord(adminId, otp);
   await sendOtpEmail(email, otp);
   return { 
     success: true,
@@ -145,26 +130,19 @@ export const requestPasswordReset = async (email: string) => {
   };
 };
 
-export const resendOtp = async (email: string) => {
-  let subscription = await Subscription.findOne({ email });
-  let user = null;
-  
-  if (!subscription) {
-    user = await User.findOne({ email });
+export const adminResendOtp = async (email: string) => {
+  if (email !== ADMIN_EMAIL) {
+    throw new Error("Only admin email is allowed");
   }
   
-  if (!subscription && !user) {
+  const admin = await Admin.findOne({ email: ADMIN_EMAIL });
+  if (!admin) {
     throw new Error("Email not found. Please check your email address");
   }
   
-  const account = subscription || user;
-  if (!account) {
-    throw new Error("Email not found. Please check your email address");
-  }
-  
-  const userId = account._id.toString();
+  const adminId = admin._id.toString();
   const otp = generateOtpCode();
-  await createOtpRecord(userId, otp);
+  await createOtpRecord(adminId, otp);
   await sendOtpEmail(email, otp);
   return { 
     success: true,
@@ -172,25 +150,18 @@ export const resendOtp = async (email: string) => {
   };
 };
 
-export const verifyOtp = async (email: string, code: string) => {
-  let subscription = await Subscription.findOne({ email });
-  let user = null;
-  
-  if (!subscription) {
-    user = await User.findOne({ email });
+export const adminVerifyOtp = async (email: string, code: string) => {
+  if (email !== ADMIN_EMAIL) {
+    throw new Error("Only admin email is allowed");
   }
   
-  if (!subscription && !user) {
+  const admin = await Admin.findOne({ email: ADMIN_EMAIL });
+  if (!admin) {
     throw new Error("Email not found. Please check your email address");
   }
   
-  const account = subscription || user;
-  if (!account) {
-    throw new Error("Email not found. Please check your email address");
-  }
-  
-  const userId = account._id.toString();
-  const record = await getValidOtp(userId, code);
+  const adminId = admin._id.toString();
+  const record = await getValidOtp(adminId, code);
   await OtpToken.updateOne({ _id: record._id }, { verified: true, verifiedAt: new Date() });
   return { 
     success: true,
@@ -198,33 +169,21 @@ export const verifyOtp = async (email: string, code: string) => {
   };
 };
 
-export const resetPassword = async (payload: { email: string; password: string }) => {
-  let subscription = await Subscription.findOne({ email: payload.email });
-  let user = null;
-  
-  if (!subscription) {
-    user = await User.findOne({ email: payload.email });
+export const adminResetPassword = async (payload: { email: string; password: string }) => {
+  if (payload.email !== ADMIN_EMAIL) {
+    throw new Error("Only admin email is allowed");
   }
   
-  if (!subscription && !user) {
+  const admin = await Admin.findOne({ email: ADMIN_EMAIL });
+  if (!admin) {
     throw new Error("Email not found. Please check your email address");
   }
   
-  const account = subscription || user;
-  if (!account) {
-    throw new Error("Email not found. Please check your email address");
-  }
-  
-  const userId = account._id.toString();
-  const record = await getLatestUnusedOtp(userId);
+  const adminId = admin._id.toString();
+  const record = await getLatestUnusedOtp(adminId);
   await OtpToken.updateOne({ _id: record._id }, { used: true });
   const hashedPassword = await bcrypt.hash(payload.password, SALT_ROUNDS);
-  
-  if (subscription) {
-    await Subscription.updateOne({ _id: account._id }, { password: hashedPassword });
-  } else {
-    await User.updateOne({ _id: account._id }, { password: hashedPassword });
-  }
+  await Admin.updateOne({ _id: admin._id }, { password: hashedPassword });
   
   return { 
     success: true,

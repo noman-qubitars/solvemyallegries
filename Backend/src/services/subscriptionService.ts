@@ -63,15 +63,55 @@ export const processSubscription = async (data: SubscriptionData) => {
     throw new Error("Invalid card number length");
   }
 
+  const existingSubscription = await Subscription.findOne({ email });
   let customer;
+  
+  if (existingSubscription && existingSubscription.stripeCustomerId) {
+    try {
+      customer = await stripe.customers.retrieve(existingSubscription.stripeCustomerId) as Stripe.Customer;
+    } catch (error: any) {
+      try {
+        customer = await stripe.customers.create({
+          email,
+          name: `${firstName} ${lastName}`,
+          phone
+        });
+      } catch (createError: any) {
+        const errorMessage = createError?.message || "Failed to create Stripe customer";
+        throw new Error(errorMessage);
+      }
+    }
+  } else {
+    try {
+      const existingCustomers = await stripe.customers.list({ email, limit: 1 });
+      if (existingCustomers.data.length > 0) {
+        customer = existingCustomers.data[0];
+      } else {
+        customer = await stripe.customers.create({
+          email,
+          name: `${firstName} ${lastName}`,
+          phone
+        });
+      }
+    } catch (error: any) {
+      const errorMessage = error?.message || "Failed to create Stripe customer";
+      throw new Error(errorMessage);
+    }
+  }
+
+  let paymentMethod;
   try {
-    customer = await stripe.customers.create({
-      email,
-      name: `${firstName} ${lastName}`,
-      phone
+    paymentMethod = await stripe.paymentMethods.create({
+      type: "card",
+      card: {
+        number: cardNumberClean,
+        exp_month: expMonth,
+        exp_year: expYear,
+        cvc: cvc
+      }
     });
   } catch (error: any) {
-    const errorMessage = error?.message || "Failed to create Stripe customer";
+    const errorMessage = error?.message || error?.raw?.message || "Failed to create payment method";
     throw new Error(errorMessage);
   }
 
@@ -81,15 +121,7 @@ export const processSubscription = async (data: SubscriptionData) => {
       amount: 1000,
       currency: "usd",
       customer: customer.id,
-      payment_method_data: {
-        type: "card",
-        card: {
-          number: cardNumberClean,
-          exp_month: expMonth,
-          exp_year: expYear,
-          cvc: cvc
-        }
-      },
+      payment_method: paymentMethod.id,
       confirm: true,
       description: `One-time payment for ${firstName} ${lastName}`
     });
@@ -117,10 +149,9 @@ export const processSubscription = async (data: SubscriptionData) => {
     });
   }
 
-  const paymentMethodId = paymentIntent.payment_method;
-  if (typeof paymentMethodId === 'string') {
+  if (paymentMethod.id) {
     try {
-      await stripe.paymentMethods.attach(paymentMethodId, {
+      await stripe.paymentMethods.attach(paymentMethod.id, {
         customer: customer.id
       });
     } catch (error) {
@@ -128,19 +159,35 @@ export const processSubscription = async (data: SubscriptionData) => {
     }
   }
 
-  const subscription = await Subscription.create({
-    email,
-    firstName,
-    lastName,
-    phone,
-    cardNumber: `****${cardNumberClean.slice(-4)}`,
-    expiryDate,
-    cvc: "***",
-    stripePaymentIntentId: paymentIntent.id,
-    stripeCustomerId: customer.id,
-    password: hashedPassword,
-    isActive: true
-  });
+  let subscription;
+  if (existingSubscription) {
+    existingSubscription.firstName = firstName;
+    existingSubscription.lastName = lastName;
+    existingSubscription.phone = phone;
+    existingSubscription.cardNumber = `****${cardNumberClean.slice(-4)}`;
+    existingSubscription.expiryDate = expiryDate;
+    existingSubscription.cvc = "***";
+    existingSubscription.stripePaymentIntentId = paymentIntent.id;
+    existingSubscription.stripeCustomerId = customer.id;
+    existingSubscription.password = hashedPassword;
+    existingSubscription.isActive = true;
+    await existingSubscription.save();
+    subscription = existingSubscription;
+  } else {
+    subscription = await Subscription.create({
+      email,
+      firstName,
+      lastName,
+      phone,
+      cardNumber: `****${cardNumberClean.slice(-4)}`,
+      expiryDate,
+      cvc: "***",
+      stripePaymentIntentId: paymentIntent.id,
+      stripeCustomerId: customer.id,
+      password: hashedPassword,
+      isActive: true
+    });
+  }
 
   await sendSubscriptionEmail(email, firstName, lastName, password);
 

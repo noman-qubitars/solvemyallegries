@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { createCheckoutSession } from "../services/checkoutService";
 import { handleCheckoutSuccess } from "../services/subscriptionWebhookService";
+import { Subscription } from "../models/Subscription";
 
 export const createCheckout = async (req: Request, res: Response) => {
   try {
@@ -10,6 +11,14 @@ export const createCheckout = async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         message: "All fields are required"
+      });
+    }
+
+    const existingSubscription = await Subscription.findOne({ email });
+    if (existingSubscription) {
+      return res.status(400).json({
+        success: false,
+        message: "You already subscription get"
       });
     }
 

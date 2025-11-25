@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { signin as signinService, requestPasswordReset, resendOtp as resendOtpService, verifyOtp as verifyOtpService, resetPassword as resetPasswordService } from "../services/authService";
-import { signinSchema, forgotPasswordSchema, verifyOtpSchema, resetPasswordSchema } from "../lib/validation/authSchemas";
+import { adminSignin as adminSigninService, adminRequestPasswordReset, adminResendOtp as adminResendOtpService, adminVerifyOtp as adminVerifyOtpService, adminResetPassword as adminResetPasswordService } from "../services/adminAuthService";
+import { adminSigninSchema, adminForgotPasswordSchema, adminVerifyOtpSchema, adminResetPasswordSchema } from "../lib/validation/authSchemas";
 import { validate } from "../lib/validation/validateRequest";
 
 const determineStatus = (message: string) => {
-  if (message.includes("required") || message.includes("must be") || message.includes("Invalid OTP") || message.includes("password is wrong") || message.includes("email is wrong") || message.includes("credentials are wrong") || message.includes("email address is wrong")) {
+  if (message.includes("required") || message.includes("must be") || message.includes("Invalid OTP") || message.includes("password is wrong") || message.includes("email is wrong") || message.includes("credentials are wrong") || message.includes("email address is wrong") || message.includes("Only admin email is allowed")) {
     return 400;
   }
   if (message.includes("not found") || message.includes("expired")) {
@@ -24,11 +24,11 @@ const handleError = (res: Response, error: unknown) => {
   });
 };
 
-export const signin = [
-  validate(signinSchema),
+export const adminSignin = [
+  validate(adminSigninSchema),
   async (req: Request, res: Response) => {
     try {
-      const result = await signinService(req.body);
+      const result = await adminSigninService(req.body);
       res.status(200).json(result);
     } catch (error) {
       handleError(res, error);
@@ -36,11 +36,11 @@ export const signin = [
   }
 ];
 
-export const forgotPassword = [
-  validate(forgotPasswordSchema),
+export const adminForgotPassword = [
+  validate(adminForgotPasswordSchema),
   async (req: Request, res: Response) => {
     try {
-      const result = await requestPasswordReset(req.body.email);
+      const result = await adminRequestPasswordReset(req.body.email);
       res.status(200).json(result);
     } catch (error) {
       handleError(res, error);
@@ -48,12 +48,12 @@ export const forgotPassword = [
   }
 ];
 
-export const verifyOtp = [
-  validate(verifyOtpSchema),
+export const adminVerifyOtp = [
+  validate(adminVerifyOtpSchema),
   async (req: Request, res: Response) => {
     try {
       const code = req.body.code || req.body.otp;
-      const result = await verifyOtpService(req.body.email, code);
+      const result = await adminVerifyOtpService(req.body.email, code);
       res.status(200).json(result);
     } catch (error) {
       handleError(res, error);
@@ -61,11 +61,11 @@ export const verifyOtp = [
   }
 ];
 
-export const resetPassword = [
-  validate(resetPasswordSchema),
+export const adminResetPassword = [
+  validate(adminResetPasswordSchema),
   async (req: Request, res: Response) => {
     try {
-      const result = await resetPasswordService({
+      const result = await adminResetPasswordService({
         email: req.body.email,
         password: req.body.password
       });
@@ -76,11 +76,11 @@ export const resetPassword = [
   }
 ];
 
-export const resendOtp = [
-  validate(forgotPasswordSchema),
+export const adminResendOtp = [
+  validate(adminForgotPasswordSchema),
   async (req: Request, res: Response) => {
     try {
-      const result = await resendOtpService(req.body.email);
+      const result = await adminResendOtpService(req.body.email);
       res.status(200).json(result);
     } catch (error) {
       handleError(res, error);

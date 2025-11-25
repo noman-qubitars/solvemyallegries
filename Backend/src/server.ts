@@ -20,5 +20,3 @@ connectDB().then(() => {
   process.on("SIGINT", handleShutdown);
   process.on("SIGTERM", handleShutdown);
 });
-
-

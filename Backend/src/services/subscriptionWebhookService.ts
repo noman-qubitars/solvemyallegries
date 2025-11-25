@@ -64,4 +64,3 @@ export const handleCheckoutSuccess = async (sessionId: string) => {
     throw new Error(error?.message || "Failed to process subscription");
   }
 };
-

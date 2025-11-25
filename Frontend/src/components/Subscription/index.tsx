@@ -41,9 +41,6 @@ const Subscription: React.FC<SubscriptionProps> = ({ paymentSuccess = false }) =
         lastName: "",
         email: "",
         phone: "",
-        cardNumber: "",
-        expiryDate: "",
-        cvc: "",
     };
 
     const handleSubmit = async (values: typeof initialValues, { setSubmitting, setFieldError, resetForm }: any) => {
@@ -102,7 +99,7 @@ const Subscription: React.FC<SubscriptionProps> = ({ paymentSuccess = false }) =
                         validationSchema={subscriptionSchema}
                         onSubmit={handleSubmit}
                     >
-                        {({ errors, touched, setFieldValue, values, isSubmitting }) => (
+                        {({ errors, touched, setFieldValue, values, isSubmitting, resetForm }) => (
                             <Form className="mt-[12px]">
                                 <div className="space-y-4">
                                     <div>
@@ -157,73 +154,10 @@ const Subscription: React.FC<SubscriptionProps> = ({ paymentSuccess = false }) =
                                     </div>
                                 </div>
 
-                                <p className="text-green font-poppins font-normal mt-[24px] mb-[12px]">
-                                    Add Payment Details
-                                </p>
-                                <div className="space-y-4">
-                                    <div>
-                                        <div className={`border ${errors.cardNumber && touched.cardNumber ? 'border-red' : 'border-gray-100'} rounded-xl px-4 py-2 sm:py-3 md:py-2 lg:py-3 xl:py-4 flex items-center gap-3`}>
-                                            <Field
-                                                type="text"
-                                                name="cardNumber"
-                                                placeholder="1234 1234 1234 1234"
-                                                className="w-full outline-none border-none placeholder-gray-100"
-                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                                    const v = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-                                                    const matches = v.match(/\d{4,16}/g);
-                                                    const match = (matches && matches[0]) || '';
-                                                    const parts = [];
-                                                    for (let i = 0, len = match.length; i < len; i += 4) {
-                                                        parts.push(match.substring(i, i + 4));
-                                                    }
-                                                    const formatted = parts.length ? parts.join(' ') : v;
-                                                    setFieldValue('cardNumber', formatted);
-                                                }}
-                                            />
-                                            <Image
-                                                src='/images/mastercard.png'
-                                                alt='mockup'
-                                                width={32}
-                                                height={20}
-                                                className=""
-                                            />
-                                        </div>
-                                        <ErrorMessage name="cardNumber" component="div" className="text-red text-sm mt-1" />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <Field
-                                                type="text"
-                                                name="expiryDate"
-                                                placeholder="MM / YY"
-                                                className={`w-full px-4 py-2 sm:py-3 md:py-2 lg:py-3 xl:py-4 border ${errors.expiryDate && touched.expiryDate ? 'border-red' : 'border-gray-100'} rounded-xl outline-none`}
-                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                                    const v = e.target.value.replace(/\D/g, '');
-                                                    const formatted = v.length >= 2 ? v.substring(0, 2) + '/' + v.substring(2, 4) : v;
-                                                    setFieldValue('expiryDate', formatted);
-                                                }}
-                                            />
-                                            <ErrorMessage name="expiryDate" component="div" className="text-red text-sm mt-1" />
-                                        </div>
-                                        <div>
-                                            <Field
-                                                type="text"
-                                                name="cvc"
-                                                placeholder="CVC"
-                                                className={`w-full px-4 py-2 sm:py-3 md:py-2 lg:py-3 xl:py-4 border ${errors.cvc && touched.cvc ? 'border-red' : 'border-gray-100'} rounded-xl outline-none`}
-                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                                    const value = e.target.value.replace(/\D/g, '').substring(0, 4);
-                                                    setFieldValue('cvc', value);
-                                                }}
-                                            />
-                                            <ErrorMessage name="cvc" component="div" className="text-red text-sm mt-1" />
-                                        </div>
-                                    </div>
-                                </div>
-
                                 <div className="flex gap-[12px] mt-[32px]">
                                     <button
                                         type="button"
+                                        onClick={() => resetForm()}
                                         className="w-full h-[40px] cursor-pointer sm:h-[46px] md:h-[40px] lg:h-[52px] xl:h-[56px] border border-gray-100 rounded-xl text-gray-150 text-center font-poppins font-normal"
                                     >
                                         Cancel
@@ -237,7 +171,7 @@ const Subscription: React.FC<SubscriptionProps> = ({ paymentSuccess = false }) =
                                     </button>
                                 </div>
                                 <p className="font-poppins font-normal text-gray-150 mt-[24px]">
-                                    By providing your card information, you agree with Terms and Conditions
+                                    By proceeding, you agree with Terms and Conditions
                                 </p>
                             </Form>
                         )}
