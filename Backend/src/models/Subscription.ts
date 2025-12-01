@@ -34,4 +34,3 @@ const SubscriptionSchema = new Schema<ISubscription>(
 );
 
 export const Subscription = mongoose.model<ISubscription>("Subscription", SubscriptionSchema);
-

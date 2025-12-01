@@ -238,6 +238,8 @@ export interface UserManagementDetailModalItem {
     day: string;
     question: string;
     response: string;
+    responseone?: string;
+    answerone?: string;
     answer: string;
     questionone: string;
     array:{
@@ -245,18 +247,18 @@ export interface UserManagementDetailModalItem {
         title: string;
         rating: string;
     }[];
-    description: string;
-    ratingthree: string;
+    description?: string;
+    ratingthree?: string;
     questiontwo: string;
-    arrayone: {
+    arrayone?: {
         title: string;
     }[];
-    questionthree: string;
-    arraytwo: {
+    questionthree?: string;
+    arraytwo?: {
         title: string;
     }[];
-    questionfour: string;
-    arraythree: {
+    questionfour?: string;
+    arraythree?: {
         title: string;
     }[];
 }
@@ -264,9 +266,9 @@ export interface UserManagementDetailModalItem {
 export const UserManagementDetailModalData: UserManagementDetailModalItem[] = [
     {
         day: "Day 1",
-        question: "Q1: When you have allergy symptoms, how badly are you affected?",
+        question: "Q1: How do you feel today?",
         response: "Response",
-        answer: "I hardly notice them",
+        answer: "I feel great",
         questionone: "Q2: Please select top 3 symptoms that apply to you:",
         array: [
             {
@@ -284,47 +286,56 @@ export const UserManagementDetailModalData: UserManagementDetailModalItem[] = [
                 title: "Fatigue",
                 rating: "Rating: 2",
             },
-        ],
-        description: "Previous day’s sleep and overall rest",
-        ratingthree: "Rating: 6",
-        questiontwo: "Q3: What are the symptoms of your headache? Select up to 4:",
-        arrayone: [
             {
-                title: "Throbbing headache",
-            },
-            {
-                title: "Affects vision",
-            },
-            {
-                title: "Sinus headache",
-            },
-            {
-                title: "Located behind eyes",
-            }
-        ],
-        questionthree: "Q4: Please select all that apply to fatigue:",
-        arraytwo: [
-            {
-                title: "I feel fatigue all day",
-            },
-            {
-                title: "Activities exhaust me",
+                symptom: "Symptom 4",
+                title: "Sleep Rest",
+                rating: "Rating: 2",
             },
         ],
-        questionfour: "Q5: What are your eye symptoms? Select up to 4:",
-        arraythree: [
-            {
-                title: "Watery",
-            },
-            {
-                title: "Swollen",
-            },
-            {
-                title: "Red",
-            },
-            {
-                title: "Scratchy",
-            },
-        ],
+        questiontwo: "Q3: Did you take your supplements today?",
+        responseone: "Response",
+        answerone: "Yes",
+        // description: "Previous day’s sleep and overall rest",
+        // ratingthree: "Rating: 6",
+        // arrayone: [
+        //     {
+        //         title: "Throbbing headache",
+        //     },
+        //     {
+        //         title: "Affects vision",
+        //     },
+        //     {
+        //         title: "Sinus headache",
+        //     },
+        //     {
+        //         title: "Located behind eyes",
+        //     }
+        // ],
+        // questionthree: "Q4: Did you take your supplements today?",
+        // responseone: "Response",
+        // answerone: "Yes",
+        // arraytwo: [
+        //     {
+        //         title: "I feel fatigue all day",
+        //     },
+        //     {
+        //         title: "Activities exhaust me",
+        //     },
+        // ],
+        // questionfour: "Q5: What are your eye symptoms? Select up to 4:",
+        // arraythree: [
+        //     {
+        //         title: "Watery",
+        //     },
+        //     {
+        //         title: "Swollen",
+        //     },
+        //     {
+        //         title: "Red",
+        //     },
+        //     {
+        //         title: "Scratchy",
+        //     },
+        // ],
     },
 ];

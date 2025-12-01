@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { signin as signinService, requestPasswordReset, resendOtp as resendOtpService, verifyOtp as verifyOtpService, resetPassword as resetPasswordService } from "../services/authService";
-import { signinSchema, forgotPasswordSchema, verifyOtpSchema, resetPasswordSchema } from "../lib/validation/authSchemas";
-import { validate } from "../lib/validation/validateRequest";
+import { signin as signinService, requestPasswordReset, resendOtp as resendOtpService, verifyOtp as verifyOtpService, resetPassword as resetPasswordService } from "./auth.service";
+import { signinSchema, forgotPasswordSchema, verifyOtpSchema, resetPasswordSchema } from "./auth.schemas";
+import { validate } from "../../lib/validation/validateRequest";
 
 const determineStatus = (message: string) => {
   if (message.includes("required") || message.includes("must be") || message.includes("Invalid OTP") || message.includes("password is wrong") || message.includes("email is wrong") || message.includes("credentials are wrong") || message.includes("email address is wrong")) {
@@ -27,31 +27,31 @@ const handleError = (res: Response, error: unknown) => {
 export const signin = [
   validate(signinSchema),
   async (req: Request, res: Response) => {
-    try {
-      const result = await signinService(req.body);
-      res.status(200).json(result);
-    } catch (error) {
-      handleError(res, error);
-    }
+  try {
+    const result = await signinService(req.body);
+    res.status(200).json(result);
+  } catch (error) {
+    handleError(res, error);
+  }
   }
 ];
 
 export const forgotPassword = [
   validate(forgotPasswordSchema),
   async (req: Request, res: Response) => {
-    try {
-      const result = await requestPasswordReset(req.body.email);
-      res.status(200).json(result);
-    } catch (error) {
-      handleError(res, error);
-    }
+  try {
+    const result = await requestPasswordReset(req.body.email);
+    res.status(200).json(result);
+  } catch (error) {
+    handleError(res, error);
+  }
   }
 ];
 
 export const verifyOtp = [
   validate(verifyOtpSchema),
   async (req: Request, res: Response) => {
-    try {
+  try {
       const code = req.body.code || req.body.otp;
       const result = await verifyOtpService(req.body.email, code);
       res.status(200).json(result);
@@ -69,22 +69,22 @@ export const resetPassword = [
         email: req.body.email,
         password: req.body.password
       });
-      res.status(200).json(result);
-    } catch (error) {
-      handleError(res, error);
-    }
+    res.status(200).json(result);
+  } catch (error) {
+    handleError(res, error);
+  }
   }
 ];
 
 export const resendOtp = [
   validate(forgotPasswordSchema),
   async (req: Request, res: Response) => {
-    try {
+  try {
       const result = await resendOtpService(req.body.email);
-      res.status(200).json(result);
-    } catch (error) {
-      handleError(res, error);
-    }
+    res.status(200).json(result);
+  } catch (error) {
+    handleError(res, error);
+  }
   }
 ];
 

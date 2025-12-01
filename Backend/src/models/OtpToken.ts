@@ -24,4 +24,3 @@ const OtpTokenSchema = new Schema<IOtpToken>(
 );
 
 export const OtpToken = mongoose.model<IOtpToken>("OtpToken", OtpTokenSchema);
-

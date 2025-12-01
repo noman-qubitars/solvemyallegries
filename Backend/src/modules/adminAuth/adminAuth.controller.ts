@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { adminSignin as adminSigninService, adminRequestPasswordReset, adminResendOtp as adminResendOtpService, adminVerifyOtp as adminVerifyOtpService, adminResetPassword as adminResetPasswordService } from "../services/adminAuthService";
-import { adminSigninSchema, adminForgotPasswordSchema, adminVerifyOtpSchema, adminResetPasswordSchema } from "../lib/validation/authSchemas";
-import { validate } from "../lib/validation/validateRequest";
+import { adminSignin as adminSigninService, adminRequestPasswordReset, adminResendOtp as adminResendOtpService, adminVerifyOtp as adminVerifyOtpService, adminResetPassword as adminResetPasswordService } from "./adminAuth.service";
+import { adminSigninSchema, adminForgotPasswordSchema, adminVerifyOtpSchema, adminResetPasswordSchema } from "./adminAuth.schemas";
+import { validate } from "../../lib/validation/validateRequest";
 
 const determineStatus = (message: string) => {
   if (message.includes("required") || message.includes("must be") || message.includes("Invalid OTP") || message.includes("password is wrong") || message.includes("email is wrong") || message.includes("credentials are wrong") || message.includes("email address is wrong") || message.includes("Only admin email is allowed")) {

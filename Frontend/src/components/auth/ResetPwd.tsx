@@ -1,4 +1,5 @@
 "use client";
+
 import Image from "next/image";
 import { FaRegEnvelope } from "react-icons/fa6";
 import { MdOutlineLock } from "react-icons/md";
@@ -72,7 +73,7 @@ const ResetPwd = () => {
               <div className="my-5">
                 <label className="block text-sm font-bold mb-2 ms-4">Email Address</label>
                 <div className="flex justify-center items-center">
-                  <div className={`flex items-center border ${errors.email && touched.email ? 'border-red-500' : 'border-gray-300'} w-[355px] lg:w-[400px] rounded-full overflow-hidden focus-within:ring-2 focus-within:ring-green-600`}>
+                  <div className={`flex items-center border ${errors.email && touched.email ? 'border-red-500' : 'border-gray-300'} w-[400px] rounded-full overflow-hidden focus-within:ring-2 focus-within:ring-green-600`}>
                     <span className="text-gray-400 px-4 shrink-0">
                       <FaRegEnvelope />
                     </span>

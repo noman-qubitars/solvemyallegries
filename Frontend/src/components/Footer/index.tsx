@@ -44,7 +44,7 @@ const Footer: React.FC = () => {
                 </div>
                 <p className="text-center font-poppins font-normal text-[12px] text-gray-250 flex items-center mt-6 z-10">
                     <MdCopyright />
-                    Copyright 2024 - SaveMyAllergies
+                    Copyright 2025 - SaveMyAllergies
                 </p>
                 <div className="absolute bottom-0 left-0 w-full">
                     <Image

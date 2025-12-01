@@ -1,15 +1,79 @@
 "use client"
+import React, { useState, useMemo } from "react";
 import Highcharts from "highcharts"
 import HighchartsReact from "highcharts-react-official"
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
-import { useState } from "react";
+import { DailySession } from '@/lib/api/dailySessionApi';
 
-const SymptomsChart = () => {
+interface SymptomsChartProps {
+    userId: string;
+    sessions: DailySession[];
+}
+
+const SymptomsChart: React.FC<SymptomsChartProps> = ({ sessions }) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isFullScreen, setIsFullScreen] = useState(false);
-    const days = Array.from({ length: 31 }, (_, i) => `Day ${i + 1}`)
+    
+    const chartData = useMemo(() => {
+        console.log('SymptomsChart - sessions received:', sessions);
+        console.log('SymptomsChart - sessions length:', sessions?.length);
+        
+        if (!sessions || sessions.length === 0) {
+            console.log('SymptomsChart - No sessions, returning empty array');
+            return [];
+        }
+        
+        const sortedSessions = [...sessions].sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return dateA.getTime() - dateB.getTime();
+        });
+        
+        console.log('SymptomsChart - sortedSessions:', sortedSessions);
+        console.log('SymptomsChart - sortedSessions dates:', sortedSessions.map(s => ({
+            date: s.date,
+            dateObj: new Date(s.date),
+            utcDate: `${new Date(s.date).getUTCFullYear()}-${new Date(s.date).getUTCMonth()}-${new Date(s.date).getUTCDate()}`
+        })));
+        
+        const data: number[] = [];
+        
+        sortedSessions.forEach((session, index) => {
+            console.log(`SymptomsChart - Processing session ${index + 1}:`, {
+                date: session.date,
+                answersCount: session.answers.length,
+                answers: session.answers
+            });
+            
+            const ratingAnswers = session.answers.filter(
+                answer => answer.question?.questionType === 'rating' && typeof answer.answer === 'number'
+            );
+            
+            console.log(`SymptomsChart - Session ${index + 1} rating answers:`, ratingAnswers);
+            
+            if (ratingAnswers.length > 0) {
+                const firstRating = ratingAnswers[0].answer as number;
+                console.log(`SymptomsChart - Session ${index + 1} adding rating:`, firstRating);
+                data.push(firstRating);
+            } else {
+                console.log(`SymptomsChart - Session ${index + 1} has no rating answers`);
+            }
+        });
+        
+        console.log('SymptomsChart - Final chartData:', data);
+        console.log('SymptomsChart - chartData length:', data.length);
+        
+        return data;
+    }, [sessions]);
 
-    const options: Highcharts.Options = {
+    const days = useMemo(() => {
+        const dayLabels = chartData.map((_, i) => `Day ${i + 1}`);
+        console.log('SymptomsChart - days array:', dayLabels);
+        console.log('SymptomsChart - days length:', dayLabels.length);
+        return dayLabels;
+    }, [chartData]);
+
+    const options: Highcharts.Options = useMemo(() => ({
         chart: {
             type: "line",
             height: 300,
@@ -22,7 +86,7 @@ const SymptomsChart = () => {
             labels: {
                 style: { fontSize: "11px", color: "#717171" },
             },
-            tickInterval: 2,
+            tickInterval: days.length <= 2 ? undefined : 2,
             gridLineWidth: 0,
             gridLineColor: "#e0e0e0",
         },
@@ -83,7 +147,7 @@ const SymptomsChart = () => {
             {
                 type: "line",
                 name: "Symptoms",
-                data: [2, 4, 6, 3, 7, 8, 5, 6, 7, 4, 5, 6, 3, 5, 7, 8, 6, 4, 5, 6, 7, 8, 9, 10, 6, 4, 5, 6, 7, 8, 6],
+                data: chartData.length > 0 ? chartData : [0],
                 showInLegend: false,
                 color: "#374151",
                 lineWidth: 2,
@@ -105,13 +169,13 @@ const SymptomsChart = () => {
                     },
                     chartOptions: {
                         xAxis: {
-                            tickInterval: 3,
+                            tickInterval: days.length <= 2 ? undefined : 3,
                         },
                     },
                 },
             ],
         },
-    }
+    }), [chartData, days]);
 
     return (
         <div className={`rounded-xl shadow-sm border border-gray-200 p-4 bg-white transition-all duration-300 w-[99.4%] ${isFullScreen ? ' fixed inset-0 z-50 flex flex-col justify-center bg-white overflow-hidden' : ''}`}>

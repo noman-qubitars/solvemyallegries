@@ -1,10 +1,10 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { config } from "../config/env";
-import { User } from "../models/User";
-import { Subscription } from "../models/Subscription";
-import { OtpToken } from "../models/OtpToken";
-import { sendOtpEmail } from "./mailService";
+import { config } from "../../config/env";
+import { User } from "../../models/User";
+import { Subscription } from "../../models/Subscription";
+import { OtpToken } from "../../models/OtpToken";
+import { sendOtpEmail } from "../../services/mailService";
 
 const SALT_ROUNDS = 10;
 const OTP_LENGTH = 4;
@@ -21,7 +21,7 @@ const generateOtpCode = () => {
 
 const createOtpRecord = async (userId: string, code: string) => {
   const hashedCode = await bcrypt.hash(code, SALT_ROUNDS);
-  const expiresAt = new Date(Date.now() + 2 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
   return OtpToken.create({
     code: hashedCode,
     expiresAt,
@@ -86,35 +86,95 @@ const getLatestUnusedOtp = async (userId: string) => {
   throw new Error("No verified OTP found. Please verify OTP first");
 };
 
-
 export const signin = async (payload: { email: string; password: string }) => {
-  let subscription = await Subscription.findOne({ email: payload.email });
-  let user = null;
+  // Always check User model first for status (User model is source of truth for account status)
+  const user = await User.findOne({ email: payload.email });
   
-  if (!subscription) {
-    user = await User.findOne({ email: payload.email });
+  // Check if user is blocked BEFORE checking password or subscription
+  if (user && user.status === "Blocked") {
+    throw new Error("Your account has been blocked. Please contact support");
   }
   
-  if (!subscription && !user) {
-    throw new Error("Your email is wrong");
+  // Check Subscription model as well (user might exist in both)
+  const subscription = await Subscription.findOne({ email: payload.email });
+  
+  if (!user && !subscription) {
+    throw new Error("Your email is incorrect");
   }
   
-  const account = subscription || user;
-  if (!account) {
-    throw new Error("Your email is wrong");
+  // Try to validate password against User model first, then Subscription
+  let isValid = false;
+  let account = null;
+  let userId = null;
+  
+  if (user) {
+    isValid = await bcrypt.compare(payload.password, user.password);
+    if (isValid) {
+      account = user;
+      userId = user._id.toString();
+    }
   }
   
-  const isValid = await bcrypt.compare(payload.password, account.password);
-  if (!isValid) {
-    throw new Error("Your password is wrong");
+  // If User password doesn't match, try Subscription password
+  if (!isValid && subscription) {
+    isValid = await bcrypt.compare(payload.password, subscription.password);
+    if (isValid) {
+      account = subscription;
+      userId = subscription._id.toString();
+      
+      // If password matches Subscription but User exists, sync the password to User model
+      if (user) {
+        user.password = subscription.password;
+        await user.save();
+      }
+    }
   }
   
-  const userId = account._id.toString();
+  if (!isValid || !account || !userId) {
+    throw new Error("Your password is incorrect");
+  }
+  
+  let userName = "";
+  
+  if (user && user.name) {
+    userName = user.name;
+  } else if (subscription) {
+    userName = `${subscription.firstName} ${subscription.lastName}`.trim();
+  }
+  
+  if (!userName) {
+    userName = payload.email.split("@")[0];
+  }
+  
+  if (user) {
+    user.activity = new Date();
+    if (!user.name && subscription) {
+      user.name = userName;
+    }
+    await user.save();
+  } else if (subscription) {
+    const createdUser = await User.findOneAndUpdate(
+      { email: payload.email },
+      {
+        email: payload.email,
+        password: subscription.password,
+        name: userName,
+        status: "Active",
+        activity: new Date()
+      },
+      { upsert: true, new: true }
+    );
+    if (createdUser) {
+      userId = createdUser._id.toString();
+    }
+  }
+  
   return { 
     success: true,
-    token: createToken(userId), 
-    userId: userId,
-    email: payload.email
+    token: createToken(userId as string), 
+    userId: userId as string,
+    email: payload.email,
+    name: userName
   };
 };
 
@@ -231,4 +291,3 @@ export const resetPassword = async (payload: { email: string; password: string }
     message: "Password reset successfully" 
   };
 };
-

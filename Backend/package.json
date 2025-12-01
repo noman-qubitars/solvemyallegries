@@ -7,7 +7,9 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "seed:admin": "ts-node src/scripts/seedAdmin.ts"
+    "seed:admin": "ts-node src/scripts/seedAdmin.ts",
+    "seed:questions": "ts-node src/scripts/seedQuestions.ts",
+    "seed:daily-session-questions": "ts-node src/scripts/seedDailySessionQuestions.ts"
   },
   "keywords": [],
   "author": "",

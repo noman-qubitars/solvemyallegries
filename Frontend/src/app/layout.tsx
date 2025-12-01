@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import ToasterWrapper from "@/components/Toaster/ToasterWrapper";
+import { StoreProvider } from "@/lib/StoreProvider";
 
 const poppinss = Poppins({
   variable: "--font-poppins",
@@ -11,7 +12,7 @@ const poppinss = Poppins({
 });
 
 const circularStd = localFont({
-  src: "../../public/fonts/CircularStd-Book.ttf",
+  src: "./fonts/CircularStd-Book.ttf",
   variable: "--font-circularStd",
 });
 
@@ -30,9 +31,11 @@ export default function RootLayout({
       <body
         className={`${poppinss.variable} ${circularStd.variable}`}
       >
-        <ToasterWrapper>
-          {children}
-        </ToasterWrapper>
+        <StoreProvider>
+          <ToasterWrapper>
+            {children}
+          </ToasterWrapper>
+        </StoreProvider>
       </body>
     </html>
   );

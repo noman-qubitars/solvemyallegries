@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { adminSignin, adminForgotPassword, adminVerifyOtp, adminResetPassword, adminResendOtp } from "../controllers/adminAuthController";
+import { adminSignin, adminForgotPassword, adminVerifyOtp, adminResetPassword, adminResendOtp } from "./adminAuth.controller";
 
 const router = Router();
 

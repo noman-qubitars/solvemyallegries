@@ -30,4 +30,3 @@ export const adminResetPasswordSchema = Yup.object().shape({
     .required('Please confirm your password')
     .oneOf([Yup.ref('password')], 'Passwords must match'),
 });
-

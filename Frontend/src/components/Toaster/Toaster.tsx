@@ -2,7 +2,7 @@
 
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
 import { IoClose } from "react-icons/io5";
-import { TiTick } from "react-icons/ti";
+import Frame from "@/Icons/Frame";
 
 interface Toast {
   id: string;
@@ -83,7 +83,7 @@ const ToastItem = ({ toast, onClose }: ToastItemProps) => {
         ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-full"}
         ${
           toast.type === "error"
-            ? "bg-white border-red-500"
+            ? "border-transparent"
             : "border-transparent"
         }
       `}
@@ -92,16 +92,20 @@ const ToastItem = ({ toast, onClose }: ToastItemProps) => {
         ...(toast.type === "success" && {
           background: "linear-gradient(to right, #11401c, #1f7332, #859b5b)",
         }),
+        ...(toast.type === "error" && {
+          backgroundColor: "#EBEDF0",
+        }),
       }}
     >
       {toast.type === "success" && (
         <div className="shrink-0 text-white">
-          <TiTick size={20} />
+          <Frame />
         </div>
       )}
       {toast.type === "error" && (
         <div className="shrink-0 text-red-500">
-          <IoClose size={20} />
+          {/* <IoClose size={20} /> */}
+          <Frame />
         </div>
       )}
       <p className={`flex-1 text-sm font-medium ${
@@ -111,8 +115,8 @@ const ToastItem = ({ toast, onClose }: ToastItemProps) => {
       </p>
       <button
         onClick={handleClose}
-        className={`shrink-0 hover:opacity-70 transition-opacity ${
-          toast.type === "error" ? "text-gray-400" : "text-white"
+        className={`shrink-0 hover:opacity-70 transition-opacity cursor-pointer ${
+          toast.type === "error" ? "text-gray-600" : "text-white"
         }`}
         aria-label="Close toast"
       >

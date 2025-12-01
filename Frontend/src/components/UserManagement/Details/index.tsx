@@ -4,23 +4,54 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import BreadCrum from "./BreadCrum";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
-import { UserManagementDetailData } from "@/data/UserManagement";
 import { MdBlock } from 'react-icons/md';
 import { GrRotateLeft } from "react-icons/gr";
 import Calendar from "./Calendar";
 import SymptomsChart from "./SymptomsChart";
+import { useGetUserByIdQuery, useToggleUserStatusMutation } from "@/lib/api/userApi";
+import { useGetDailySessionsQuery } from "@/lib/api/dailySessionApi";
+import { useToaster } from "@/components/Toaster";
 
 
 interface UserManagementDetailProps {
     id: string;
 }
 
+const formatDate = (date: Date | string): string => {
+  const d = new Date(date);
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+};
+
+const formatActivity = (date: Date | string): string => {
+  const d = new Date(date);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return "Just Now";
+  if (diffMins < 60) return `${diffMins} ${diffMins === 1 ? 'Minute' : 'Minutes'} Ago`;
+  if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? 'Hour' : 'Hours'} Ago`;
+  if (diffDays < 7) return `${diffDays} ${diffDays === 1 ? 'Day' : 'Days'} Ago`;
+  return formatDate(d);
+};
+
 const UserManagementDetail: React.FC<UserManagementDetailProps> = ({ id }) => {
+    const { showToast } = useToaster();
+    const { data: userData, isLoading: userLoading } = useGetUserByIdQuery(id, {
+        skip: !id,
+    });
+    const { data: sessionsData } = useGetDailySessionsQuery({ userId: id }, {
+        skip: !id,
+    });
+    const [toggleUserStatus] = useToggleUserStatusMutation();
 
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const [status, setStatus] = useState("active");
     const toggleDropdown = () => setIsOpen(!isOpen);
+    
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (
@@ -34,12 +65,53 @@ const UserManagementDetail: React.FC<UserManagementDetailProps> = ({ id }) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleStatusToggle = () => {
-        setStatus((prev) => (prev === "active" ? "blocked" : "active"));
+    const handleStatusToggle = async () => {
+        try {
+            if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
+                showToast("Admin authentication required", "error");
+                return;
+            }
+
+            const result = await toggleUserStatus(id).unwrap();
+            
+            if (result.success) {
+                showToast(result.message, "success");
+            }
+        } catch (error: any) {
+            showToast(error?.data?.message || "Failed to update user status", "error");
+        }
         setIsOpen(false);
     };
 
-    console.log(id, "id>>>>>>>");
+    const user = userData?.data;
+    const sessions = sessionsData?.data || [];
+    const completedDays = sessions.length;
+
+    if (userLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <p className="text-[#11401C] font-medium">Loading...</p>
+            </div>
+        );
+    }
+
+    if (!user) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <p className="text-[#11401C] font-medium">User not found</p>
+            </div>
+        );
+    }
+
+    const status = user.status.toLowerCase();
+    const profileData = [
+        { label: "Full Name:", data: user.name },
+        { label: "Joined On:", data: formatDate(user.joinedDate) },
+        { label: "Email ID:", data: user.email },
+        { label: "session Days Completed:", data: `Day ${completedDays}` },
+        { label: "Phone Number:", data: user.phone || "N/A" },
+        { label: "Last Activity:", data: user.activity ? formatActivity(user.activity) : "N/A" },
+    ];
 
     return (
         <div>
@@ -60,7 +132,7 @@ const UserManagementDetail: React.FC<UserManagementDetailProps> = ({ id }) => {
                                     className={`h-[8px] w-[8px] rounded-full ${status === "active" ? "bg-[#21BA45]" : "bg-[#DB3B21]"
                                         }`}
                                 ></div>
-                                {status === "active" ? "Active" : "Blocked"}
+                                {user.status}
                             </div>
                             <div className="relative" ref={dropdownRef}>
                                 <HiOutlineDotsHorizontal className="text-[#000000] text-[14px] cursor-pointer" onClick={toggleDropdown} />
@@ -87,25 +159,22 @@ const UserManagementDetail: React.FC<UserManagementDetailProps> = ({ id }) => {
                     </div>
                     <div className="mt-4 flex gap-4">
                         <Image src="/images/User/persons.svg" alt="User" width={197} height={197} />
-                        {UserManagementDetailData.map((item, index) => (
-                            <div key={index} className="grid grid-cols-2 gap-3">
-                                {item.array.map((item, index) => (
-                                    <div key={index} className="flex flex-col gap-1">
-                                        <p className="text-[#B3B3B3] font-medium">{item.label}</p>
-                                        <p className="text-[#11401C] font-medium text-[18px]">{item.data}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        ))}
+                        <div className="grid grid-cols-2 gap-3">
+                            {profileData.map((item, index) => (
+                                <div key={index} className="flex flex-col gap-1">
+                                    <p className="text-[#B3B3B3] font-medium">{item.label}</p>
+                                    <p className="text-[#11401C] font-medium text-[18px]">{item.data}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-
                 </div>
                 <div className="w-full lg:w-[29%] bg-white rounded-[12px] shadow-sm px-[8px] py-[12px]">
-                    <Calendar />
+                    <Calendar userId={id} sessions={sessions} />
                 </div>
             </div>
             <div className="mt-4">
-                <SymptomsChart />
+                <SymptomsChart userId={id} sessions={sessions} />
             </div>
         </div>
     );

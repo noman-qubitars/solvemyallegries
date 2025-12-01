@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import Image from "next/image";
 import { FaArrowRightFromBracket } from "react-icons/fa6";
@@ -29,7 +30,7 @@ const SignIn = () => {
     password: "",
   };
 
-  const handleSignIn = async (values: typeof initialValues, { setSubmitting, setFieldError, setErrors, setTouched }: any) => {
+  const handleSignIn = async (values: typeof initialValues, { setSubmitting, setErrors, setTouched }: any) => {
     try {
       const response = await api.post('/admin/auth/signin', {
         email: values.email,
@@ -103,7 +104,7 @@ const SignIn = () => {
             <div className="mb-4">
               <label className="block text-sm font-bold mb-1 ms-7">Email Address</label>
               <div className="flex justify-center items-center">
-                <div className={`flex items-center border ${errors.email && touched.email ? 'border-red-500' : 'border-gray-300'} w-[355px] lg:w-[400px] rounded-full overflow-hidden focus-within:ring-2 focus-within:ring-green-600`}>
+                <div className={`flex items-center border ${errors.email && touched.email ? 'border-red-500' : 'border-gray-300'} w-[400px] rounded-full overflow-hidden focus-within:ring-2 focus-within:ring-green-600`}>
                   <span className="text-gray-400 px-4 shrink-0">
                     <FaRegEnvelope />
                   </span>
@@ -120,7 +121,7 @@ const SignIn = () => {
             <div className="mb-4">
               <label className="block text-sm font-bold mb-1 ms-7">Password</label>
               <div className="flex justify-center items-center">
-                <div className={`flex items-center border ${errors.password && touched.password ? 'border-red-500' : 'border-gray-300'} w-[355px] lg:w-[400px] rounded-full overflow-hidden focus-within:ring-2 focus-within:ring-green-600`}>
+                <div className={`flex items-center border ${errors.password && touched.password ? 'border-red-500' : 'border-gray-300'} w-[400px] rounded-full overflow-hidden focus-within:ring-2 focus-within:ring-green-600`}>
                   <span className="text-gray-400 px-4 shrink-0">
                     <MdOutlineLock />
                   </span>
@@ -142,8 +143,8 @@ const SignIn = () => {
             </div>
 
             <div className="flex items-center justify-between mb-4 mx-7 text-sm">
-              <label className="inline-flex items-center">
-                <input type="checkbox" className="mr-2 bg-green-900 text-green-900" />
+              <label className="flex items-center cursor-pointer">
+                <input type="checkbox" className="mr-2 bg-green-900 text-green-900 mt-1" />
                 Remember Me
               </label>
               <Link href="/resetpwd" className="text-green-900 hover:underline">

@@ -1,16 +1,16 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { config } from "../config/env";
-import { Admin } from "../models/Admin";
-import { OtpToken } from "../models/OtpToken";
-import { sendOtpEmail } from "./mailService";
+import { config } from "../../config/env";
+import { Admin } from "../../models/Admin";
+import { OtpToken } from "../../models/OtpToken";
+import { sendOtpEmail } from "../../services/mailService";
 
 const SALT_ROUNDS = 10;
 const OTP_LENGTH = 4;
 const ADMIN_EMAIL = "nomanshabbir10@gmail.com";
 
 const createToken = (adminId: string) => {
-  return jwt.sign({ sub: adminId, role: "admin" }, config.jwtSecret, { expiresIn: "1h" });
+  return jwt.sign({ sub: adminId, role: "admin" }, config.jwtSecret, { expiresIn: "1h" })
 };
 
 const generateOtpCode = () => {
@@ -21,7 +21,7 @@ const generateOtpCode = () => {
 
 const createOtpRecord = async (adminId: string, code: string) => {
   const hashedCode = await bcrypt.hash(code, SALT_ROUNDS);
-  const expiresAt = new Date(Date.now() + 2 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
   return OtpToken.create({
     code: hashedCode,
     expiresAt,
@@ -88,17 +88,17 @@ const getLatestUnusedOtp = async (adminId: string) => {
 
 export const adminSignin = async (payload: { email: string; password: string }) => {
   if (payload.email !== ADMIN_EMAIL) {
-    throw new Error("Your email is wrong");
+    throw new Error("Your email is incorrect");
   }
   
   const admin = await Admin.findOne({ email: ADMIN_EMAIL });
   if (!admin) {
-    throw new Error("Your email is wrong");
+    throw new Error("Your email is incorrect");
   }
   
   const isValid = await bcrypt.compare(payload.password, admin.password);
   if (!isValid) {
-    throw new Error("Your password is wrong");
+    throw new Error("Your password is incorrect");
   }
   
   const adminId = admin._id.toString();

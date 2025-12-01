@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
-import { createCheckoutSession } from "../services/checkoutService";
-import { handleCheckoutSuccess } from "../services/subscriptionWebhookService";
-import { Subscription } from "../models/Subscription";
+import { createCheckoutSession, handleCheckoutSuccess } from "./subscription.service";
+import { Subscription } from "../../models/Subscription";
 
 export const createCheckout = async (req: Request, res: Response) => {
   try {
@@ -14,11 +13,11 @@ export const createCheckout = async (req: Request, res: Response) => {
       });
     }
 
-    const existingSubscription = await Subscription.findOne({ email });
+    const existingSubscription = await Subscription.findOne({ email, isActive: true });
     if (existingSubscription) {
       return res.status(400).json({
         success: false,
-        message: "You already subscription get"
+        message: "You already have an active subscription"
       });
     }
 

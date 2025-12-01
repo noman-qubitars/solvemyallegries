@@ -152,7 +152,7 @@ const AllergyReports: React.FC = () => {
                 </tr>
               ) : (
                 currentItems.map((user, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
+                  <tr key={index} className="hover:bg-gray-50/20">
                     <td className="px-4 py-4">
                       <label className="inline-flex items-center cursor-pointer">
                         <input

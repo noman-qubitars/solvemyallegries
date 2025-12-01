@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { adminResetPasswordSchema } from "@/lib/validation/adminAuthSchema";
 import axios from "axios";
+import { useToaster } from "@/components/Toaster";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
@@ -23,6 +24,7 @@ const NewPassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
+  const { showToast } = useToaster();
 
   useEffect(() => {
     // Get email from sessionStorage
@@ -39,7 +41,7 @@ const NewPassword = () => {
     confirmPassword: "",
   };
 
-  const handleResetPassword = async (values: typeof initialValues, { setSubmitting, setFieldError }: any) => {
+  const handleResetPassword = async (values: typeof initialValues, { setSubmitting }: any) => {
     try {
       const response = await api.post('/admin/auth/reset-password', {
         email: email,
@@ -47,16 +49,17 @@ const NewPassword = () => {
       });
 
       if (response.data.success) {
-        // Clear sessionStorage
+        showToast("Password reset successfully!", "success");
         sessionStorage.removeItem('resetEmail');
-        // Redirect to sign in page
-        router.push("/");
+        setTimeout(() => {
+          router.push("/signin");
+        }, 500);
       } else {
         throw new Error(response.data.message || 'Password reset failed');
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || 'Password reset failed. Please try again.';
-      setFieldError('password', errorMessage);
+      showToast(errorMessage, "error");
       setSubmitting(false);
     }
   };
@@ -86,45 +89,49 @@ const NewPassword = () => {
             <Form className="w-full py-3">
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-1 ms-3">New Password</label>
-                <div className="relative flex justify-center items-center">
-                  <span className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400">
-                    <MdOutlineLock />
-                  </span>
-                  <Field
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    placeholder="********"
-                    className={`border ${errors.password && touched.password ? 'border-red-500' : 'border-gray-300'} w-[355px] lg:w-[400px] mx-auto rounded-full h-10 px-10 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:align-middle`}
-                  />
-                  <span
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
-                  >
-                    {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
-                  </span>
+                <div className="flex justify-center items-center">
+                  <div className={`flex items-center border ${errors.password && touched.password ? 'border-red-500' : 'border-gray-300'} w-[400px] rounded-full overflow-hidden focus-within:ring-2 focus-within:ring-green-600`}>
+                    <span className="text-gray-400 px-4 shrink-0">
+                      <MdOutlineLock />
+                    </span>
+                    <Field
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      placeholder="********"
+                      className="flex-1 h-10 text-sm focus:outline-none placeholder:align-middle"
+                    />
+                    <span
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="text-gray-400 px-4 cursor-pointer shrink-0"
+                    >
+                      {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
+                    </span>
+                  </div>
                 </div>
-                <ErrorMessage name="password" component="div" className="text-red-500 text-sm text-center mt-1" />
+                <ErrorMessage name="password" component="div" className="text-red-500 text-sm text-left mt-1 ms-3" />
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-bold mb-1 ms-3">Re enter New Password</label>
-                <div className="relative flex justify-center items-center">
-                  <span className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400">
-                    <MdOutlineLock />
-                  </span>
-                  <Field
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirmPassword"
-                    placeholder="********"
-                    className={`border ${errors.confirmPassword && touched.confirmPassword ? 'border-red-500' : 'border-gray-300'} w-[355px] lg:w-[400px] mx-auto rounded-full h-10 px-10 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:align-middle`}
-                  />
-                  <span
-                    onClick={() => setShowConfirmPassword((prev) => !prev)}
-                    className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
-                  >
-                    {showConfirmPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
-                  </span>
+                <div className="flex justify-center items-center">
+                  <div className={`flex items-center border ${errors.confirmPassword && touched.confirmPassword ? 'border-red-500' : 'border-gray-300'} w-[400px] rounded-full overflow-hidden focus-within:ring-2 focus-within:ring-green-600`}>
+                    <span className="text-gray-400 px-4 shrink-0">
+                      <MdOutlineLock />
+                    </span>
+                    <Field
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      placeholder="********"
+                      className="flex-1 h-10 text-sm focus:outline-none placeholder:align-middle"
+                    />
+                    <span
+                      onClick={() => setShowConfirmPassword((prev) => !prev)}
+                      className="text-gray-400 px-4 cursor-pointer shrink-0"
+                    >
+                      {showConfirmPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
+                    </span>
+                  </div>
                 </div>
-                <ErrorMessage name="confirmPassword" component="div" className="text-red-500 text-sm text-center mt-1" />
+                <ErrorMessage name="confirmPassword" component="div" className="text-red-500 text-sm text-left mt-1 ms-3" />
               </div>
               <button
                 type="submit"

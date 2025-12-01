@@ -4,24 +4,58 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import BreadCrum from "./BreadCrum";
-import { UserManagementData as initialData } from "@/data/UserManagement";
+import { UserManagementItem } from "@/data/UserManagement";
 import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import { AiOutlineEye } from 'react-icons/ai';
 import { GrRotateLeft } from "react-icons/gr";
 import { MdBlock, MdOutlineKeyboardDoubleArrowLeft, MdKeyboardArrowLeft, MdOutlineKeyboardDoubleArrowRight, MdKeyboardArrowRight } from 'react-icons/md';
+import { HiOutlineDotsHorizontal } from "react-icons/hi";
+import { useToaster } from "@/components/Toaster";
+import { useGetUsersQuery, useToggleUserStatusMutation } from "@/lib/api/userApi";
+
+// Helper function to format date
+const formatDate = (date: Date | string): string => {
+  const d = new Date(date);
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+};
+
+// Helper function to format activity time
+const formatActivity = (date: Date | string): string => {
+  const d = new Date(date);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return "Just Now";
+  if (diffMins < 60) return `${diffMins} ${diffMins === 1 ? 'Minute' : 'Minutes'} Ago`;
+  if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? 'Hour' : 'Hours'} Ago`;
+  if (diffDays < 7) return `${diffDays} ${diffDays === 1 ? 'Day' : 'Days'} Ago`;
+  return formatDate(d);
+};
 
 const UserManagement: React.FC = () => {
 
   const router = useRouter();
+  const { showToast } = useToaster();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState<(UserManagementItem & { mongoId: string })[]>([]);
   const [selectedRows, setSelectedRows] = useState<string[]>([])
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  const { data: usersData, isLoading: loading, error } = useGetUsersQuery(undefined, {
+    skip: typeof window !== 'undefined' && !localStorage.getItem('adminToken'),
+    refetchOnMountOrArgChange: true,
+    pollingInterval: 30000,
+  });
+  const [toggleUserStatus] = useToggleUserStatusMutation();
 
   const filteredData = data
     .filter(user =>
@@ -35,7 +69,7 @@ const UserManagement: React.FC = () => {
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = filteredData.slice(startIndex, startIndex + itemsPerPage);
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const itemsPerPageOptions = [10, 20, 30, 50];
 
   const toggleCheckbox = (email: string) => {
@@ -53,6 +87,24 @@ const UserManagement: React.FC = () => {
       setSelectedRows(data.map((user) => user.email))
     }
   }
+
+  useEffect(() => {
+    if (usersData?.success) {
+      const transformedData = usersData.data.map((user: any) => ({
+        id: user.id,
+        image: "/images/User/person.svg",
+        name: user.name,
+        email: user.email,
+        date: formatDate(user.joinedDate),
+        status: user.status,
+        activity: formatActivity(user.activity),
+        icon: HiOutlineDotsHorizontal,
+      }));
+      setData(transformedData);
+    } else if (error) {
+      showToast("Failed to fetch users", "error");
+    }
+  }, [usersData, error, showToast]);
 
   const handleSort = () => {
     const sorted = [...data].sort((a, b) => {
@@ -79,18 +131,33 @@ const UserManagement: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [openDropdownIndex]);
 
-  const toggleBlockStatus = (email: string) => {
-    setData(prevData =>
-      prevData.map(user =>
-        user.email === email
-          ? {
-            ...user,
-            status: user.status === "Active" ? "Blocked" : "Active",
-            activity: "Just Now"
-          }
-          : user
-      )
-    );
+  const toggleBlockStatus = async (userId: string, email: string) => {
+    try {
+      if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
+        showToast("Admin authentication required", "error");
+        return;
+      }
+
+      const result = await toggleUserStatus(userId).unwrap();
+      
+      if (result.success) {
+        const newStatus = result.data.status;
+        setData(prevData =>
+          prevData.map(user =>
+            user.email === email
+              ? {
+                ...user,
+                status: newStatus,
+                activity: "Just Now"
+              }
+              : user
+          )
+        );
+        showToast(result.message, "success");
+      }
+    } catch (error: any) {
+      showToast(error?.data?.message || "Failed to update user status", "error");
+    }
     setOpenDropdownIndex(null);
   };
 
@@ -143,7 +210,13 @@ const UserManagement: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-[#CCCCCC]">
-              {filteredData.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="text-center text-[#222222] font-medium py-8">
+                    Loading...
+                  </td>
+                </tr>
+              ) : filteredData.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="text-center text-[#222222] font-medium py-2">
                     No Data Available
@@ -151,7 +224,7 @@ const UserManagement: React.FC = () => {
                 </tr>
               ) : (
                 currentItems.map((user, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
+                  <tr key={index} className="hover:bg-gray-50/20">
                     <td className="px-4 py-4">
                       <label className="inline-flex items-center cursor-pointer">
                         <input
@@ -201,6 +274,7 @@ const UserManagement: React.FC = () => {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleView(user.id);
+                                console.log(user.id, "user.id>>>>>>>");
                               }}
                               className="w-full cursor-pointer flex gap-2 pl-[12px] py-[12px] text-[#11401C] font-medium border-b border-[#B3B3B3]"
                             >
@@ -209,7 +283,7 @@ const UserManagement: React.FC = () => {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                toggleBlockStatus(user.email);
+                                toggleBlockStatus(user.id.toString(), user.email);
                               }}
                               className="w-full cursor-pointer flex gap-2 pl-[12px] py-[12px] text-[#717171] font-medium border-b border-[#B3B3B3]"
                             >
@@ -261,7 +335,7 @@ const UserManagement: React.FC = () => {
           </div>
           <div className="flex flex-wrap justify-center items-center gap-2">
             <div className="text-[#313131] text-[14px] font-normal border-r border-[#A6A6A6] pr-3">
-              {currentPage} of {data.length} pages
+              {currentPage} of {totalPages} pages
             </div>
             <button
               onClick={() => setCurrentPage(1)}

@@ -19,4 +19,3 @@ export const subscriptionSchema = Yup.object().shape({
     .required('Phone number is required')
     .min(10, 'Phone number must be at least 10 digits'),
 });
-
