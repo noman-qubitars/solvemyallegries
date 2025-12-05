@@ -132,7 +132,7 @@ const Yoga: React.FC<YogaProps> = ({ videos, index, goBack, onEdit, onDelete }) 
                         {otherVideos.slice(0, 2).map((video, idx) => {
                             const originalIndex = videos.findIndex(v => v._id === video._id);
                             return (
-                                <div key={video._id} className="border border-[#B1A9A9] rounded-lg cursor-pointer">
+                                <div key={video._id} className="border border-[#B1A9A9] rounded-lg">
                                     <div className="relative">
                                         <video src={`${apiUrl}${video.videoUrl}`} className="w-full h-[169px] rounded-tl-lg rounded-tr-lg overflow-hidden block object-cover" preload="metadata" />
                                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
