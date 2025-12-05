@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation';
 import Layout from '@/components/Layout';
 import Subscription from '@/components/Subscription';
@@ -14,8 +14,7 @@ const api = axios.create({
   },
 });
 
-const SubscriptionPage: React.FC = () => {
-
+const SubscriptionContent: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const searchParams = useSearchParams();
@@ -92,6 +91,23 @@ const SubscriptionPage: React.FC = () => {
             }
         </Layout>
     )
+}
+
+const SubscriptionPage: React.FC = () => {
+    return (
+        <Suspense fallback={
+            <Layout>
+                <div className="flex items-center justify-center min-h-screen">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green mx-auto mb-4"></div>
+                        <p className="text-green font-poppins">Loading...</p>
+                    </div>
+                </div>
+            </Layout>
+        }>
+            <SubscriptionContent />
+        </Suspense>
+    );
 }
 
 export default SubscriptionPage;
