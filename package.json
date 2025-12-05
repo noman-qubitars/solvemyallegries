@@ -1,0 +1,44 @@
+{
+  "name": "solvemyallergies",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@headlessui/react": "^2.2.9",
+    "@reduxjs/toolkit": "^2.11.0",
+    "axios": "^1.13.2",
+    "emoji-picker-react": "^4.16.1",
+    "formik": "^2.4.9",
+    "highcharts": "^12.4.0",
+    "highcharts-react-official": "^3.2.3",
+    "next": "16.0.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.4.0",
+    "react-phone-input-2": "^2.15.1",
+    "react-redux": "^9.2.0",
+    "react-slick": "^0.31.0",
+    "slick-carousel": "^1.8.1",
+    "socket.io-client": "^4.7.5",
+    "yup": "^1.7.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4.1.17",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.3",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-plugin-import": "^2.31.0",
+    "postcss": "^8",
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5"
+  }
+}
