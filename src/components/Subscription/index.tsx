@@ -23,7 +23,6 @@ interface SubscriptionProps {
 }
 
 const Subscription: React.FC<SubscriptionProps> = ({ paymentSuccess = false }) => {
-
     const [isModalOpen, setIsModalOpen] = useState(paymentSuccess);
 
     useEffect(() => {

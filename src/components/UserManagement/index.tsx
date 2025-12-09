@@ -43,12 +43,13 @@ const UserManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const [data, setData] = useState<(UserManagementItem & { mongoId: string })[]>([]);
-  const [selectedRows, setSelectedRows] = useState<string[]>([])
+  // const [selectedRows, setSelectedRows] = useState<string[]>([])
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const errorShownRef = useRef(false);
 
   const { data: usersData, isLoading: loading, error } = useGetUsersQuery(undefined, {
     skip: typeof window !== 'undefined' && !localStorage.getItem('adminToken'),
@@ -71,24 +72,25 @@ const UserManagement: React.FC = () => {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const itemsPerPageOptions = [10, 20, 30, 50];
 
-  const toggleCheckbox = (email: string) => {
-    setSelectedRows((prev) =>
-      prev.includes(email)
-        ? prev.filter((item) => item !== email)
-        : [...prev, email]
-    )
-  }
+  // const toggleCheckbox = (email: string) => {
+  //   setSelectedRows((prev) =>
+  //     prev.includes(email)
+  //       ? prev.filter((item) => item !== email)
+  //       : [...prev, email]
+  //   )
+  // }
 
-  const toggleAllCheckboxes = () => {
-    if (selectedRows.length === data.length) {
-      setSelectedRows([])
-    } else {
-      setSelectedRows(data.map((user) => user.email))
-    }
-  }
+  // const toggleAllCheckboxes = () => {
+  //   if (selectedRows.length === data.length) {
+  //     setSelectedRows([])
+  //   } else {
+  //     setSelectedRows(data.map((user) => user.email))
+  //   }
+  // }
 
   useEffect(() => {
     if (usersData?.success) {
+      errorShownRef.current = false;
       // Filter out admin users and only show users with role "user"
       const transformedData = usersData.data
         .filter((user: any) => user.role === "user")
@@ -104,10 +106,11 @@ const UserManagement: React.FC = () => {
           icon: HiOutlineDotsHorizontal,
         }));
       setData(transformedData);
-    } else if (error) {
+    } else if (error && !errorShownRef.current) {
+      errorShownRef.current = true;
       showToast("Failed to fetch users", "error");
     }
-  }, [usersData, error, showToast]);
+  }, [usersData, error]);
 
   const handleSort = () => {
     const sorted = [...data].sort((a, b) => {
@@ -256,22 +259,29 @@ const UserManagement: React.FC = () => {
                     <td className="px-4 py-4 text-[#222222] font-medium text-[14px] whitespace-nowrap">{user.date}</td>
                     <td className="px-4 py-4 flex justify-center whitespace-nowrap">
                       <div
-                        className={`flex items-center gap-2 px-[22px] w-fit py-[10px] rounded-[12px] text-[14px] font-medium ${user.status === 'Active'
-                          ? 'bg-[#E9F8EC] text-[#21BA45]'
-                          : 'bg-[#FBE9E9] text-[#DB2828]'
-                          }`}
+                        className={`flex items-center gap-2 px-[22px] w-fit py-[10px] rounded-[12px] text-[14px] font-medium ${
+                          user.status === 'Active'
+                            ? 'bg-[#E9F8EC] text-[#21BA45]'
+                            : user.status === 'Blocked'
+                            ? 'bg-[#FBE9E9] text-[#DB2828]'
+                            : 'bg-[#F5F5F5] text-[#808080]'
+                        }`}
                       >
                         <div className="h-[8px] w-[8px] rounded-full bg-current"></div>
-                        {user.status}
+                        {user.status === 'Blocked' ? 'Blocked' : user.status === 'inactive' ? 'Unverified' : user.status}
                       </div>
                     </td>
                     <td className="px-4 py-4 text-[#222222] font-medium text-[14px] whitespace-nowrap">{user.activity}</td>
                     <td className="px-4 py-4 flex justify-center whitespace-nowrap">
                       <div ref={dropdownRef} data-dropdown-index={index}>
-                        <button className="text-[#000000] cursor-pointer" onClick={() => toggleDropdown(index)}>
+                        <button 
+                          className={`text-[#000000] ${user.status === 'inactive' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`} 
+                          onClick={() => user.status !== 'inactive' && toggleDropdown(index)}
+                          disabled={user.status === 'inactive'}
+                        >
                           <user.icon className="w-5 h-5" />
                         </button>
-                        {openDropdownIndex === index && (
+                        {openDropdownIndex === index && user.status !== 'inactive' && (
                           <div className="absolute right-[4.5rem] mt-0 w-[127px] bg-white rounded-[6px] shadow-lg border border-[#B3B3B3] z-50">
                             <button
                               onClick={(e) => {

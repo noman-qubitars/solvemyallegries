@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import BreadCrum from "./BreadCrum";
 import Upload from "./Upload/Upload";
 import Drafts from "./Drafts/Drafts";
@@ -27,12 +27,14 @@ const EducationalVideos: React.FC = () => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [videoToDelete, setVideoToDelete] = useState<{ video: EducationalVideo; source: "upload" | "draft" } | null>(null);
+  const uploadedErrorShownRef = useRef(false);
+  const draftErrorShownRef = useRef(false);
 
-  const { data: uploadedVideosData, refetch: refetchUploaded } = useGetVideosQuery(
+  const { data: uploadedVideosData, error: uploadedError, refetch: refetchUploaded } = useGetVideosQuery(
     { status: 'uploaded' }
   );
   
-  const { data: draftVideosData, refetch: refetchDrafts } = useGetVideosQuery(
+  const { data: draftVideosData, error: draftError, refetch: refetchDrafts } = useGetVideosQuery(
     { status: 'draft' }
   );
 
@@ -42,6 +44,24 @@ const EducationalVideos: React.FC = () => {
 
   const uploadedVideos = uploadedVideosData?.data || [];
   const drafts = draftVideosData?.data || [];
+
+  useEffect(() => {
+    if (uploadedVideosData?.success) {
+      uploadedErrorShownRef.current = false;
+    } else if (uploadedError && !uploadedErrorShownRef.current) {
+      uploadedErrorShownRef.current = true;
+      showToast("Failed to fetch uploaded videos", "error");
+    }
+  }, [uploadedVideosData, uploadedError, showToast]);
+
+  useEffect(() => {
+    if (draftVideosData?.success) {
+      draftErrorShownRef.current = false;
+    } else if (draftError && !draftErrorShownRef.current) {
+      draftErrorShownRef.current = true;
+      showToast("Failed to fetch draft videos", "error");
+    }
+  }, [draftVideosData, draftError, showToast]);
 
   const handleOpenModal = () => {
     setEditingVideo(null);

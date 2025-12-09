@@ -37,17 +37,20 @@ const Messages: React.FC = () => {
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const allMessagesErrorShownRef = useRef(false);
+  const userMessagesErrorShownRef = useRef(false);
+  const usersErrorShownRef = useRef(false);
 
-  const { data: allMessagesData, isLoading: messagesLoading, refetch: refetchAllMessages } = useGetAllMessagesQuery({
+  const { data: allMessagesData, error: allMessagesError, isLoading: messagesLoading, refetch: refetchAllMessages } = useGetAllMessagesQuery({
     isRead: activeTab === 'Unread' ? false : undefined,
   });
 
-  const { data: userMessagesData, isLoading: userMessagesLoading, refetch: refetchUserMessages } = useGetUserMessagesQuery(
+  const { data: userMessagesData, error: userMessagesError, isLoading: userMessagesLoading, refetch: refetchUserMessages } = useGetUserMessagesQuery(
     selectedUserId || '',
     { skip: !selectedUserId }
   );
 
-  const { data: usersData, refetch: refetchUsers } = useGetUsersQuery();
+  const { data: usersData, error: usersError, refetch: refetchUsers } = useGetUsersQuery();
   const [sendMessage, { isLoading: sending }] = useSendMessageMutation();
   const [markAsRead] = useMarkAsReadMutation();
   const [deleteMessage] = useDeleteMessageMutation();
@@ -153,6 +156,33 @@ const Messages: React.FC = () => {
   const unreadCount = useMemo(() => {
     return messages.filter(m => m.sentBy === "user" && m.isRead === false).length;
   }, [messages]);
+
+  useEffect(() => {
+    if (allMessagesData?.success) {
+      allMessagesErrorShownRef.current = false;
+    } else if (allMessagesError && !allMessagesErrorShownRef.current) {
+      allMessagesErrorShownRef.current = true;
+      showToast("Failed to fetch messages", "error");
+    }
+  }, [allMessagesData, allMessagesError, showToast]);
+
+  useEffect(() => {
+    if (userMessagesData?.success) {
+      userMessagesErrorShownRef.current = false;
+    } else if (userMessagesError && !userMessagesErrorShownRef.current && selectedUserId) {
+      userMessagesErrorShownRef.current = true;
+      showToast("Failed to fetch user messages", "error");
+    }
+  }, [userMessagesData, userMessagesError, selectedUserId, showToast]);
+
+  useEffect(() => {
+    if (usersData?.success) {
+      usersErrorShownRef.current = false;
+    } else if (usersError && !usersErrorShownRef.current) {
+      usersErrorShownRef.current = true;
+      showToast("Failed to fetch users", "error");
+    }
+  }, [usersData, usersError, showToast]);
 
   useEffect(() => {
     const socket = getSocket();
