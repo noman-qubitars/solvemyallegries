@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from 'react';
 import Image from 'next/image';
 import { Message } from '@/lib/api/messageApi';
 
@@ -7,6 +8,7 @@ interface User {
   id?: string;
   mongoId?: string;
   name: string;
+  image?: string;
 }
 
 interface MessageItemProps {
@@ -22,14 +24,36 @@ const MessageItem: React.FC<MessageItemProps> = ({
   formatTime,
   onContextMenu,
 }) => {
+  const [imageError, setImageError] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  const userImage = selectedUser?.image || null;
+
   return (
-    <div 
+    <div
       className={`flex ${msg.sentBy === "user" ? "justify-start" : "justify-end"} items-end`}
       onContextMenu={msg.sentBy === "admin" ? (e) => onContextMenu(e, msg) : undefined}
     >
       {msg.sentBy === "user" && (
-        <div className="w-[25px] h-[25px] rounded-full bg-[#11401C] flex items-center justify-center text-white text-[10px] font-semibold mr-2">
-          {selectedUser?.name.charAt(0).toUpperCase() || 'U'}
+        <div className="relative w-[25px] h-[25px] rounded-full overflow-hidden shrink-0 bg-[#11401C] mr-2">
+          {userImage && !avatarError ? (
+            <Image
+              src={userImage}
+              alt={selectedUser?.name || 'User'}
+              width={25}
+              height={25}
+              className="object-cover rounded-full"
+              unoptimized
+              onError={() => {
+                console.error('Avatar failed to load:', userImage);
+                setAvatarError(true);
+              }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-white text-[10px] font-semibold">
+              {selectedUser?.name.charAt(0).toUpperCase() || 'U'}
+            </div>
+          )}
         </div>
       )}
       <div
@@ -42,21 +66,40 @@ const MessageItem: React.FC<MessageItemProps> = ({
           msg.content
         ) : msg.messageType === 'voice' && msg.fileUrl ? (
           <audio controls className="max-w-full">
-            <source src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${msg.fileUrl}`} />
+            <source src={`${apiBaseUrl}${msg.fileUrl}`} />
           </audio>
         ) : msg.fileUrl ? (
           <div>
             {msg.messageType === 'image' ? (
-              <img src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${msg.fileUrl}`} alt={msg.fileName} className="max-w-full rounded" />
+              <div className="relative">
+                {imageError ? (
+                  <div className="flex items-center justify-center p-4 bg-gray-100 rounded-lg text-gray-500 text-sm">
+                    Failed to load image
+                  </div>
+                ) : (
+                  <img
+                    src={`${apiBaseUrl}${msg.fileUrl}`}
+                    alt={msg.fileName || 'Image'}
+                    className="max-w-full max-h-[300px] rounded-lg object-contain cursor-pointer hover:opacity-90 transition-opacity"
+                    onError={() => setImageError(true)}
+                    onClick={() => {
+                      window.open(`${apiBaseUrl}${msg.fileUrl}`, '_blank');
+                    }}
+                  />
+                )}
+                {msg.content && (
+                  <p className="mt-2 text-sm">{msg.content}</p>
+                )}
+              </div>
             ) : msg.messageType === 'pdf' ? (
               <div className="flex items-center gap-2">
                 <span>📄</span>
-                <a href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${msg.fileUrl}`} download className="text-blue-600 underline">
+                <a href={`${apiBaseUrl}${msg.fileUrl}`} download className="text-blue-600 underline">
                   {msg.fileName || 'Download PDF'}
                 </a>
               </div>
             ) : (
-              <a href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${msg.fileUrl}`} download className="text-blue-600 underline">
+              <a href={`${apiBaseUrl}${msg.fileUrl}`} download className="text-blue-600 underline">
                 {msg.fileName || 'Download file'}
               </a>
             )}
@@ -76,4 +119,3 @@ const MessageItem: React.FC<MessageItemProps> = ({
 };
 
 export default MessageItem;
-

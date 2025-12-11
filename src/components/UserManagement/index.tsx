@@ -50,6 +50,7 @@ const UserManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const errorShownRef = useRef(false);
+  const [imageErrors, setImageErrors] = useState<{ [key: string]: boolean }>({});
 
   const { data: usersData, isLoading: loading, error } = useGetUsersQuery(undefined, {
     skip: typeof window !== 'undefined' && !localStorage.getItem('adminToken'),
@@ -57,15 +58,25 @@ const UserManagement: React.FC = () => {
   });
   const [toggleUserStatus] = useToggleUserStatusMutation();
 
+  const getStatusForFilter = (filter: string | null): string | null => {
+    if (!filter) return null;
+    const filterMap: { [key: string]: string } = {
+      'Paid': 'Active',
+      'Unpaid': 'inactive',
+      'Blocked': 'Blocked'
+    };
+    return filterMap[filter] || null;
+  };
+
   const filteredData = data
     .filter(user =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    .filter(user =>
-      selectedFilter
-        ? user.status.toLowerCase().includes(selectedFilter.toLowerCase())
-        : true
-    );
+    .filter(user => {
+      if (!selectedFilter) return true;
+      const statusToMatch = getStatusForFilter(selectedFilter);
+      return statusToMatch ? user.status === statusToMatch : false;
+    });
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = filteredData.slice(startIndex, startIndex + itemsPerPage);
@@ -91,20 +102,34 @@ const UserManagement: React.FC = () => {
   useEffect(() => {
     if (usersData?.success) {
       errorShownRef.current = false;
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
       // Filter out admin users and only show users with role "user"
       const transformedData = usersData.data
         .filter((user: any) => user.role === "user")
-        .map((user: any) => ({
-          id: user.id,
-          mongoId: user.id,
-          image: "/images/User/person.svg",
-          name: user.name,
-          email: user.email,
-          date: formatDate(user.joinedDate),
-          status: user.status,
-          activity: formatActivity(user.activity),
-          icon: HiOutlineDotsHorizontal,
-        }));
+        .map((user: any) => {
+          // Construct image URL - handle both relative paths and full URLs
+          let imageUrl = "/images/User/person.svg";
+          if (user.image) {
+            if (user.image.startsWith('http://') || user.image.startsWith('https://')) {
+              imageUrl = user.image;
+            } else {
+              const cleanPath = user.image.startsWith('/') ? user.image : `/${user.image}`;
+              imageUrl = `${apiBaseUrl}${cleanPath}`;
+            }
+          }
+          
+          return {
+            id: user.id,
+            mongoId: user.id,
+            image: imageUrl,
+            name: user.name,
+            email: user.email,
+            date: formatDate(user.joinedDate),
+            status: user.status,
+            activity: formatActivity(user.activity),
+            icon: HiOutlineDotsHorizontal,
+          };
+        });
       setData(transformedData);
     } else if (error && !errorShownRef.current) {
       errorShownRef.current = true;
@@ -245,12 +270,25 @@ const UserManagement: React.FC = () => {
                       </label>
                     </td> */}
                     <td className="px-4 py-4 flex items-center gap-3 text-left whitespace-nowrap">
-                      <Image
-                        src={user.image}
-                        alt="User"
-                        width={25}
-                        height={25}
-                      />
+                      <div className="relative w-[25px] h-[25px] rounded-full overflow-hidden shrink-0 bg-gray-200">
+                        {imageErrors[user.id] ? (
+                          <div className="w-full h-full flex items-center justify-center bg-[#11401C] text-white text-[10px] font-semibold">
+                            {user.name.charAt(0).toUpperCase()}
+                          </div>
+                        ) : (
+                          <Image
+                            src={user.image}
+                            alt="User"
+                            width={25}
+                            height={25}
+                            className="object-cover rounded-full"
+                            unoptimized
+                            onError={() => {
+                              setImageErrors((prev) => ({ ...prev, [user.id]: true }));
+                            }}
+                          />
+                        )}
+                      </div>
                       <div>
                         <p className="font-medium text-[#484C52]">{user.name}</p>
                         <p className="text-[12px] font-normal text-[#808080]">{user.email}</p>
@@ -268,7 +306,7 @@ const UserManagement: React.FC = () => {
                         }`}
                       >
                         <div className="h-[8px] w-[8px] rounded-full bg-current"></div>
-                        {user.status === 'Blocked' ? 'Blocked' : user.status === 'inactive' ? 'Unverified' : user.status}
+                        {user.status === 'Blocked' ? 'Blocked' : user.status === 'inactive' ? 'Unpaid' : user.status === 'Active' ? 'Paid' : user.status}
                       </div>
                     </td>
                     <td className="px-4 py-4 text-[#222222] font-medium text-[14px] whitespace-nowrap">{user.activity}</td>

@@ -1,16 +1,42 @@
 "use client"
 
+import { useState } from 'react';
+import Image from 'next/image';
 import { IoIosSearch } from "react-icons/io";
 
 interface User {
   userId: string;
   name: string;
   email: string;
+  image?: string | null;
   lastMessage: string;
   lastMessageTime: string;
   isRead: boolean;
   unreadCount: number;
 }
+
+const UserAvatar: React.FC<{ image: string | null | undefined; name: string; size: number }> = ({ image, name, size }) => {
+  const [imageError, setImageError] = useState(false);
+  
+  return (
+    <div className="relative rounded-full overflow-hidden shrink-0 bg-[#11401C]" style={{ width: `${size}px`, height: `${size}px` }}>
+      {image && !imageError ? (
+        <Image
+          src={image}
+          alt={name}
+          width={size}
+          height={size}
+          className="object-cover rounded-full"
+          unoptimized
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center text-white text-[10px] font-semibold">
+          {name.charAt(0).toUpperCase()}
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface UserListProps {
   activeTab: 'All' | 'Unread';
@@ -87,9 +113,7 @@ const UserList: React.FC<UserListProps> = ({
               className={`mb-4 last:mb-0 cursor-pointer p-2 rounded-lg ${selectedUserId === user.userId ? 'bg-[#F5F6FA]' : ''}`}
             >
               <div className="flex gap-2 items-start">
-                <div className="w-[22px] h-[22px] rounded-full bg-[#11401C] flex items-center justify-center text-white text-[10px] font-semibold">
-                  {user.name.charAt(0).toUpperCase()}
-                </div>
+                <UserAvatar image={user.image} name={user.name} size={22} />
                 <div className="flex-1">
                   <p className="font-semibold text-[14px] text-[#222222]">
                     {user.name}

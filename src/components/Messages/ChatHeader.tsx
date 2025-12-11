@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from 'react';
 import Image from 'next/image';
 import { IoIosSearch } from "react-icons/io";
 import { HiOutlineDotsVertical } from "react-icons/hi";
@@ -8,6 +9,7 @@ interface User {
   id?: string;
   mongoId?: string;
   name: string;
+  image?: string;
 }
 
 interface ChatHeaderProps {
@@ -25,14 +27,34 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   onDeleteChat,
   deleteMenuRef,
 }) => {
+  const [imageError, setImageError] = useState(false);
+  const userImage = selectedUser?.image || null;
+
   return (
     <div className="flex items-center justify-between px-[24px] py-[17px] border-b border-[#AFB8CF]">
       <div className="flex items-center gap-2">
         {selectedUser ? (
           <>
             <div className='relative'>
-              <div className="w-[32px] h-[32px] rounded-full bg-[#11401C] flex items-center justify-center text-white text-[12px] font-semibold">
-                {selectedUser.name.charAt(0).toUpperCase()}
+              <div className="relative w-[32px] h-[32px] rounded-full overflow-hidden bg-[#11401C]">
+                {userImage && !imageError ? (
+                  <Image
+                    src={userImage}
+                    alt={selectedUser.name}
+                    width={32}
+                    height={32}
+                    className="object-cover rounded-full"
+                    unoptimized
+                    onError={() => {
+                      console.error('Image failed to load:', userImage);
+                      setImageError(true);
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-white text-[12px] font-semibold">
+                    {selectedUser.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
               </div>
               <div className='bg-[linear-gradient(to_right,#11401C,#1F7332,#859B5B)] rounded-full w-[8px] h-[8px] absolute bottom-0 right-0' />
             </div>
@@ -71,4 +93,3 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
 };
 
 export default ChatHeader;
-

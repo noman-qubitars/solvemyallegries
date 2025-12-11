@@ -38,4 +38,3 @@ const DeleteChatModal: React.FC<DeleteChatModalProps> = ({
 };
 
 export default DeleteChatModal;
-

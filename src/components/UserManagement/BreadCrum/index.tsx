@@ -15,7 +15,7 @@ const BreadCrum: React.FC<BreadCrumProps> = ({ onSearch, setSelectedFilter, sele
 
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const options = ['Active', 'Blocked'];
+    const options = ['Paid', 'Unpaid', 'Blocked'];
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -37,6 +37,7 @@ const BreadCrum: React.FC<BreadCrumProps> = ({ onSearch, setSelectedFilter, sele
 
     const handleReset = () => {
         setSelectedFilter(null);
+        setIsOpen(false);
     };
 
     const handleRemoveTag = () => {
@@ -78,7 +79,7 @@ const BreadCrum: React.FC<BreadCrumProps> = ({ onSearch, setSelectedFilter, sele
                                     {selectedFilter}
                                     <button
                                         onClick={handleRemoveTag}
-                                        className="text-sm font-bold text-[#999999] cursor-pointer"
+                                        className="text-sm font-bold text-[#999999] cursor-pointer pb-0.5"
                                     >
                                         ×
                                     </button>

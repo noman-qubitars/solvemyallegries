@@ -81,6 +81,7 @@ const Messages: React.FC = () => {
 
   const uniqueUsers = useMemo(() => {
     const userMap = new Map();
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
     const sortedMessages = [...messages].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     
     sortedMessages.forEach((msg) => {
@@ -88,10 +89,20 @@ const Messages: React.FC = () => {
         const user = usersData?.data?.find(u => (u.mongoId || u.id) === msg.userId);
         const unreadMsgs = messages.filter(m => m.userId === msg.userId && m.sentBy === "user" && m.isRead === false);
         const displayName = user?.name?.trim() || `User ${msg.userId.slice(-6)}`;
+        let userImage = null;
+        if (user?.image) {
+          if (user.image.startsWith('http://') || user.image.startsWith('https://')) {
+            userImage = user.image;
+          } else {
+            const cleanPath = user.image.startsWith('/') ? user.image : `/${user.image}`;
+            userImage = `${apiBaseUrl}${cleanPath}`;
+          }
+        }
         userMap.set(msg.userId, {
           userId: msg.userId,
           name: displayName,
           email: user?.email || '',
+          image: userImage,
           lastMessage: msg.content || msg.fileName || 'File',
           lastMessageTime: msg.createdAt,
           isRead: msg.sentBy === "user" ? (msg.isRead ?? false) : true,
@@ -102,6 +113,14 @@ const Messages: React.FC = () => {
         const user = usersData?.data?.find(u => (u.mongoId || u.id) === msg.userId);
         if (user?.name?.trim()) {
           existing.name = user.name.trim();
+        }
+        if (user?.image) {
+          if (user.image.startsWith('http://') || user.image.startsWith('https://')) {
+            existing.image = user.image;
+          } else {
+            const cleanPath = user.image.startsWith('/') ? user.image : `/${user.image}`;
+            existing.image = `${apiBaseUrl}${cleanPath}`;
+          }
         }
         const msgTime = new Date(msg.createdAt).getTime();
         const existingTime = new Date(existing.lastMessageTime).getTime();
@@ -121,6 +140,14 @@ const Messages: React.FC = () => {
       const userData = usersData?.data?.find(u => (u.mongoId || u.id) === user.userId);
       if (userData?.name?.trim()) {
         user.name = userData.name.trim();
+      }
+      if (userData?.image && !user.image) {
+        if (userData.image.startsWith('http://') || userData.image.startsWith('https://')) {
+          user.image = userData.image;
+        } else {
+          const cleanPath = userData.image.startsWith('/') ? userData.image : `/${userData.image}`;
+          user.image = `${apiBaseUrl}${cleanPath}`;
+        }
       }
       const unreadMsgs = messages.filter(m => m.userId === user.userId && m.sentBy === "user" && m.isRead === false);
       user.unreadCount = unreadMsgs.length;
@@ -468,7 +495,20 @@ const Messages: React.FC = () => {
 
   const selectedUser = useMemo(() => {
     if (!selectedUserId) return null;
-    return usersData?.data?.find(u => (u.mongoId || u.id) === selectedUserId);
+    const user = usersData?.data?.find(u => (u.mongoId || u.id) === selectedUserId);
+    if (!user) return null;
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    let imageUrl = user.image;
+    if (user.image) {
+      if (!user.image.startsWith('http://') && !user.image.startsWith('https://')) {
+        const cleanPath = user.image.startsWith('/') ? user.image : `/${user.image}`;
+        imageUrl = `${apiBaseUrl}${cleanPath}`;
+      }
+    }
+    return {
+      ...user,
+      image: imageUrl
+    };
   }, [selectedUserId, usersData]);
 
   const handleVoiceSend = () => {
