@@ -17,7 +17,6 @@ const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
   headers: {
     'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
   },
 });
 
@@ -33,7 +32,7 @@ const SignIn = () => {
 
   const handleSignIn = async (values: typeof initialValues, { setSubmitting, setErrors, setTouched }: any) => {
     try {
-      const response = await api.post('/auth/signin', {
+      const response = await api.post('/api/v1/auth/signin', {
         email: values.email,
         password: values.password,
       });

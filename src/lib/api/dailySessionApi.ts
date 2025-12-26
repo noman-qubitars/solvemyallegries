@@ -15,7 +15,6 @@ const baseQuery = fetchBaseQuery({
       headers.set('authorization', `Bearer ${token}`);
     }
     headers.set('Content-Type', 'application/json');
-    headers.set('ngrok-skip-browser-warning', 'true');
     return headers;
   },
 });
@@ -57,7 +56,7 @@ export const dailySessionApi = createApi({
   tagTypes: ['DailySession'],
   endpoints: (builder) => ({
     getDailySessionQuestions: builder.query({
-      query: () => '/api/daily-session/questions',
+      query: () => '/api/v1/daily-session/questions',
     }),
     getDailySessions: builder.query<{ success: boolean; data: DailySession[]; total: number }, GetDailySessionsParams>({
       query: (params) => {
@@ -65,7 +64,7 @@ export const dailySessionApi = createApi({
         if (params.userId) queryParams.append('userId', params.userId);
         if (params.startDate) queryParams.append('startDate', params.startDate);
         if (params.endDate) queryParams.append('endDate', params.endDate);
-        return `/api/daily-session?${queryParams.toString()}`;
+        return `/api/v1/daily-session?${queryParams.toString()}`;
       },
       providesTags: ['DailySession'],
     }),
@@ -74,7 +73,7 @@ export const dailySessionApi = createApi({
         const queryParams = new URLSearchParams();
         queryParams.append('userId', params.userId);
         queryParams.append('date', params.date);
-        return `/api/daily-session/by-date?${queryParams.toString()}`;
+        return `/api/v1/daily-session/by-date?${queryParams.toString()}`;
       },
       providesTags: ['DailySession'],
     }),

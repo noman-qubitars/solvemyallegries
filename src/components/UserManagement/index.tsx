@@ -20,7 +20,6 @@ const formatDate = (date: Date | string): string => {
   return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
 };
 
-// Helper function to format activity time
 const formatActivity = (date: Date | string): string => {
   const d = new Date(date);
   const now = new Date();
@@ -34,6 +33,16 @@ const formatActivity = (date: Date | string): string => {
   if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? 'Hour' : 'Hours'} Ago`;
   if (diffDays < 7) return `${diffDays} ${diffDays === 1 ? 'Day' : 'Days'} Ago`;
   return formatDate(d);
+};
+
+const getActivityDisplay = (user: any): string => {
+  if (user.isOnline) {
+    return "Online";
+  }
+  if (user.lastSessionEnd) {
+    return formatActivity(user.lastSessionEnd);
+  }
+  return formatActivity(user.activity);
 };
 
 const UserManagement: React.FC = () => {
@@ -126,7 +135,8 @@ const UserManagement: React.FC = () => {
             email: user.email,
             date: formatDate(user.joinedDate),
             status: user.status,
-            activity: formatActivity(user.activity),
+            activity: getActivityDisplay(user),
+            isOnline: user.isOnline || false,
             icon: HiOutlineDotsHorizontal,
           };
         });
@@ -309,7 +319,15 @@ const UserManagement: React.FC = () => {
                         {user.status === 'Blocked' ? 'Blocked' : user.status === 'inactive' ? 'Unpaid' : user.status === 'Active' ? 'Paid' : user.status}
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-[#222222] font-medium text-[14px] whitespace-nowrap">{user.activity}</td>
+                    <td className="px-4 py-4 text-[#222222] font-medium text-[14px] whitespace-nowrap">
+                    {user.activity}
+                      <div className="flex items-center gap-2">
+                        {/* {user.isOnline && (
+                          <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                        )} */}
+                        <span></span>
+                      </div>
+                    </td>
                     <td className="px-4 py-4 flex justify-center whitespace-nowrap">
                       <div ref={dropdownRef} data-dropdown-index={index}>
                         <button 

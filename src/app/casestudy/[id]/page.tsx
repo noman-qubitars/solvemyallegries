@@ -1,4 +1,3 @@
-import React from 'react';
 import Layout from '@/components/Layout';
 import CaseStudy from '@/components/CaseStudy';
 import { casestudypage } from '@/data/Landing';

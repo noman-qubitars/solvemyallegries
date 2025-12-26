@@ -10,7 +10,7 @@ const Home: React.FC = () => {
 
     return (
         <div className="lg:mt-[120px] mt-0">
-            <div className="relative overflow-hidden pt-[120px] sm:pt-[160px]" id="home-section">
+            <div className="relative overflow-hidden pt-[50px] sm:pt-[160px]" id="home-section">
                 <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-12 MT-10 lg:gap-4">
                     <div className="px-2 flex flex-col items-center justify-center sm:px-0">
                         <p className="text-green px-4 text-[30px] sm:text-[42px] text-center lg:text-start md:text[54px] xl:text-[64px] font-semibold font-poppins leading-[35px] sm:leading-[70px] max-w-full sm:max-w-[36rem]">

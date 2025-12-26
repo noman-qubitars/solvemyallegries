@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from 'next/navigation';
 import Solve from "@/Icons/Solve";
 import { IoReorderThree } from "react-icons/io5";
 import { IoMdClose } from "react-icons/io";
+
 const Navbar: React.FC = () => {
 
     const router = useRouter();
@@ -17,17 +18,17 @@ const Navbar: React.FC = () => {
     useEffect(() => {
         if (isModalOpen) {
             setModalClass('open');
-            document.body.style.overflow = 'hidden'; // Prevent scrolling
+            document.body.style.overflow = 'hidden'; 
         } else {
             setModalClass('close');
-            document.body.style.overflow = 'auto'; // Restore scrolling
+            document.body.style.overflow = 'auto';
         }
     }, [isModalOpen]);
 
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => { // Annotate event type
+        const handleClickOutside = (event: MouseEvent) => {
             if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-                closeModal(); // Close the modal on outside click
+                closeModal();
             }
         };
 
@@ -50,7 +51,7 @@ const Navbar: React.FC = () => {
         setModalClass("closing");
         setTimeout(() => {
             setIsModalOpen(false);
-        }, 300); // Match with transition duration
+        }, 300);
     };
 
     useEffect(() => {
@@ -66,8 +67,7 @@ const Navbar: React.FC = () => {
 
     const handleClick = (section: string) => {
         setActiveLink(section);
-        ``
-        // Scroll to the section with smooth behavior
+        closeModal();
         const element = document.getElementById(`${section}-section`);
         if (element) {
             element.scrollIntoView({ behavior: "smooth" });
@@ -78,15 +78,15 @@ const Navbar: React.FC = () => {
         <>
             <nav
                 className={`fixed left-0 px-3 right-0 z-20 flex justify-between items-center ${isScrolled
-                    ? "max-w-full mx-0 px-[7px] xl:px-[85px] bg-white shadow-lg py-4 rounded-lg top-0"
-                    : "max-w-[86rem] mx-auto bg-transparent top-5"
+                    ? "max-w-full mx-0 px-[7px] xl:px-[85px] bg-white shadow-lg py-4 top-0"
+                    : "max-w-344 mx-auto bg-transparent top-5"
                     }`}
             >
                 <div className="cursor-pointer " onClick={() => router.push('/')}>
                     <Solve />
                 </div>
                 <div className="hidden md:hidden lg:block">
-                    <div className="flex items-center gap-[3rem] lg:gap-[3.5rem]">
+                    <div className="flex items-center gap-12 lg:gap-14">
                         <button onClick={() => handleClick("home")} className={`font-circular cursor-pointer font-bold text-base ${activeLink === "home" ? "text-green" : "text-gray"
                             }`}>
                             Home
@@ -114,12 +114,12 @@ const Navbar: React.FC = () => {
             {isModalOpen && (
                 <>
                     <div
-                        className={`fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ${modalClass === "open" ? "opacity-100" : "opacity-0"
+                        className={`fixed inset-0  bg-[#BABBBB]/40 bg-opacity-50 transition-opacity duration-300 ${modalClass === "open" ? "opacity-100" : "opacity-0"
                             }`}
                     ></div>
                     <div
                         ref={modalRef}
-                        className={`fixed right-0 top-0 bg-white z-40 w-[375px] sm:w-[393px] h-screen pt-[1.25rem] px-[1.25rem] transition-transform duration-300 ${modalClass === "open"
+                        className={`fixed right-0 top-0 bg-white z-40 w-[375px] sm:w-[393px] h-screen pt-5 px-5 transition-transform duration-300 ${modalClass === "open"
                             ? "translate-x-0"
                             : modalClass === "closing"
                                 ? "translate-x-full"
@@ -131,8 +131,8 @@ const Navbar: React.FC = () => {
                         </div>
                         <div className="bg-gray w-full h-0.5 mt-3 mb-3" />
                         <div className="space-y-7">
-                            <div className="flex flex-col gap-[2rem] mt-10">
-                                <button onClick={() => handleClick("home")} className={`font-circular cursor-pointer font-bold text-base marker:text-start ${activeLink === "home" ? "text-green" : "text-gray"
+                            <div className="flex flex-col gap-6 mt-10">
+                                <button onClick={() => handleClick("home")} className={`font-circular cursor-pointer font-bold text-base text-start ${activeLink === "home" ? "text-green" : "text-gray"
                                     }`}>
                                     Home
                                 </button>

@@ -12,7 +12,6 @@ const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
   headers: {
     'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
   },
 });
 
@@ -106,7 +105,7 @@ const OtpScreen = () => {
 
     try {
       setIsVerifying(true);
-      const response = await api.post('/auth/otp', {
+      const response = await api.post('/api/v1/auth/otp', {
         email: email,
         code: otpCode,
       });
@@ -153,7 +152,7 @@ const OtpScreen = () => {
 
     try {
       setIsResending(true);
-      const response = await api.post('/auth/resend-otp', {
+      const response = await api.post('/api/v1/auth/resend-otp', {
         email: email,
       });
 

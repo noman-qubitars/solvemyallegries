@@ -8,12 +8,12 @@ import Yoga from "./Upload/Yoga";
 import Modal from "./Modal";
 import YogaDraft from "./Drafts/YogaDraft";
 import DeleteVideoModal from "./DeleteVideoModal";
-import { 
-  useGetVideosQuery, 
-  useCreateVideoMutation, 
-  useUpdateVideoMutation, 
+import {
+  useGetVideosQuery,
+  useCreateVideoMutation,
+  useUpdateVideoMutation,
   useDeleteVideoMutation,
-  EducationalVideo 
+  EducationalVideo
 } from "@/lib/api/educationalVideoApi";
 import { useToaster } from "@/components/Toaster";
 
@@ -29,13 +29,16 @@ const EducationalVideos: React.FC = () => {
   const [videoToDelete, setVideoToDelete] = useState<{ video: EducationalVideo; source: "upload" | "draft" } | null>(null);
   const uploadedErrorShownRef = useRef(false);
   const draftErrorShownRef = useRef(false);
+  const [uploadedPage, setUploadedPage] = useState(1);
+  const [draftPage, setDraftPage] = useState(1);
+  const pageSize = 10;
 
   const { data: uploadedVideosData, error: uploadedError, refetch: refetchUploaded } = useGetVideosQuery(
-    { status: 'uploaded' }
+    { status: 'uploaded', page: uploadedPage, pageSize }
   );
-  
+
   const { data: draftVideosData, error: draftError, refetch: refetchDrafts } = useGetVideosQuery(
-    { status: 'draft' }
+    { status: 'draft', page: draftPage, pageSize }
   );
 
   const [createVideo, { isLoading: creating }] = useCreateVideoMutation();
@@ -44,6 +47,13 @@ const EducationalVideos: React.FC = () => {
 
   const uploadedVideos = uploadedVideosData?.data || [];
   const drafts = draftVideosData?.data || [];
+  
+  useEffect(() => {
+    if (searchVideo) {
+      setUploadedPage(1);
+      setDraftPage(1);
+    }
+  }, [searchVideo]);
 
   useEffect(() => {
     if (uploadedVideosData?.success) {
@@ -91,11 +101,11 @@ const EducationalVideos: React.FC = () => {
           video: values.videos[0],
         }).unwrap();
       }
-      
+
       setIsModalOpen(false);
       setEditingVideo(null);
       showToast(isDraft ? "Draft saved successfully" : "Video uploaded successfully", "success");
-      
+
       setTimeout(() => {
         try {
           refetchUploaded();
@@ -135,7 +145,7 @@ const EducationalVideos: React.FC = () => {
       showToast("Video deleted successfully", "success");
       setIsDeleteModalOpen(false);
       setVideoToDelete(null);
-      
+
       setTimeout(() => {
         try {
           refetchUploaded();
@@ -167,11 +177,11 @@ const EducationalVideos: React.FC = () => {
   const EducationalBtnData = [
     {
       label: "Upload",
-      number: uploadedVideos.length > 0 ? `(${uploadedVideos.length})` : "",
+      number: uploadedVideosData?.totalVideos ? `(${uploadedVideosData.totalVideos})` : "",
     },
     {
       label: "Drafts",
-      number: drafts.length > 0 ? `(${drafts.length})` : "",
+      number: draftVideosData?.totalVideos ? `(${draftVideosData.totalVideos})` : "",
     }
   ];
 
@@ -193,37 +203,43 @@ const EducationalVideos: React.FC = () => {
           ))}
         </div>
         {activeIndex === 0 && (showUpload ?
-          <Upload 
-            videos={uploadedVideos} 
-            searchTerm={searchVideo} 
+          <Upload
+            videos={uploadedVideos}
+            searchTerm={searchVideo}
             onEdit={(index) => handleEdit(index, "upload")}
-            onDelete={(index) => handleDeleteClick(index, "upload")} 
+            onDelete={(index) => handleDeleteClick(index, "upload")}
             onSelectCard={handleSelectCard}
+            currentPage={uploadedPage}
+            totalPages={uploadedVideosData?.totalPages || 1}
+            onPageChange={setUploadedPage}
           />
           :
-          <Yoga 
-            videos={uploadedVideos} 
-            index={selectedIndex} 
-            goBack={() => setShowUpload(true)} 
-            onDelete={(index) => handleDeleteClick(index, "upload")} 
-            onEdit={(index) => handleEdit(index, "upload")} 
+          <Yoga
+            videos={uploadedVideos}
+            index={selectedIndex}
+            goBack={() => setShowUpload(true)}
+            onDelete={(index) => handleDeleteClick(index, "upload")}
+            onEdit={(index) => handleEdit(index, "upload")}
           />
         )}
         {activeIndex === 1 && (showUpload ?
-          <Drafts 
-            drafts={drafts} 
+          <Drafts
+            drafts={drafts}
             onEdit={(index) => handleEdit(index, "draft")}
-            onDelete={(index) => handleDeleteClick(index, "draft")} 
-            searchTerm={searchVideo} 
+            onDelete={(index) => handleDeleteClick(index, "draft")}
+            searchTerm={searchVideo}
             onSelectCard={handleSelectCard}
+            currentPage={draftPage}
+            totalPages={draftVideosData?.totalPages || 1}
+            onPageChange={setDraftPage}
           />
           :
-          <YogaDraft 
-            videos={drafts} 
-            index={selectedIndex} 
-            goBack={() => setShowUpload(true)} 
-            onDelete={(index) => handleDeleteClick(index, "draft")} 
-            onEdit={(index) => handleEdit(index, "draft")} 
+          <YogaDraft
+            videos={drafts}
+            index={selectedIndex}
+            goBack={() => setShowUpload(true)}
+            onDelete={(index) => handleDeleteClick(index, "draft")}
+            onEdit={(index) => handleEdit(index, "draft")}
           />
         )}
       </div>

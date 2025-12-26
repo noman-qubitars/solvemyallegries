@@ -31,7 +31,6 @@ export const ToasterProvider = ({ children }: { children: ReactNode }) => {
     const id = Math.random().toString(36).substring(7);
     setToasts((prev) => [...prev, { id, message, type }]);
 
-    // Auto remove after 4 seconds
     setTimeout(() => {
       setToasts((prev) => prev.filter((toast) => toast.id !== id));
     }, 4000);
@@ -66,7 +65,6 @@ const ToastItem = ({ toast, onClose }: ToastItemProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Trigger animation
     setTimeout(() => setIsVisible(true), 10);
   }, []);
 
@@ -125,4 +123,3 @@ const ToastItem = ({ toast, onClose }: ToastItemProps) => {
     </div>
   );
 };
-

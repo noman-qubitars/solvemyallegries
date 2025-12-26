@@ -15,7 +15,6 @@ const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
   headers: {
     'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
   },
 });
 
@@ -45,7 +44,7 @@ const Subscription: React.FC<SubscriptionProps> = ({ paymentSuccess = false }) =
 
     const handleSubmit = async (values: typeof initialValues, { setSubmitting, setFieldError, resetForm }: any) => {
         try {
-            const response = await api.post('/subscription/create-checkout', {
+            const response = await api.post('api/v1/subscription/create-checkout', {
                 email: values.email,
                 firstName: values.firstName,
                 lastName: values.lastName,

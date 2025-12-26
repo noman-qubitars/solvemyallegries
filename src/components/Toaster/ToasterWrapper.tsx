@@ -9,4 +9,3 @@ export default function ToasterWrapper({
 }) {
   return <ToasterProvider>{children}</ToasterProvider>;
 }
-

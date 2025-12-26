@@ -14,7 +14,6 @@ const baseQuery = fetchBaseQuery({
     if (token) {
       headers.set('authorization', `Bearer ${token}`);
     }
-    // Don't set Content-Type for file uploads, let browser set it with boundary
     if (endpoint !== 'createVideo' && endpoint !== 'updateVideo') {
       headers.set('Content-Type', 'application/json');
     }
@@ -36,105 +35,98 @@ const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
   return result;
 };
 
-export interface EducationalVideo {
+export interface SessionVideo {
   _id: string;
   title: string;
   description: string;
   videoUrl: string;
-  thumbnailUrl?: string;
   fileName: string;
   fileSize: number;
   mimeType: string;
+  symptoms: string[];
   status: 'uploaded' | 'draft';
   createdAt: string;
   updatedAt: string;
 }
 
-export interface GetVideosResponse {
-  success: boolean;
-  data: EducationalVideo[];
-  totalVideos: number;
-  currentPage: number;
-  pageSize: number;
-  totalPages: number;
-}
-
-export interface CreateVideoRequest {
+export interface CreateSessionVideoRequest {
   title: string;
   description?: string;
+  symptoms?: string[];
   status?: 'uploaded' | 'draft';
   video: File;
 }
 
-export interface UpdateVideoRequest {
+export interface UpdateSessionVideoRequest {
   id: string;
   title?: string;
   description?: string;
+  symptoms?: string[];
   status?: 'uploaded' | 'draft';
   video?: File;
 }
 
-export const educationalVideoApi = createApi({
-  reducerPath: 'educationalVideoApi',
+export const sessionVideoApi = createApi({
+  reducerPath: 'sessionVideoApi',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['EducationalVideo'],
+  tagTypes: ['SessionVideo'],
   endpoints: (builder) => ({
-    getVideos: builder.query<GetVideosResponse, { status?: 'uploaded' | 'draft' | 'published'; page?: number; pageSize?: number }>({
+    getVideos: builder.query<{ success: boolean; data: SessionVideo[]; total: number }, { status?: 'uploaded' | 'draft' | 'published' }>({
       query: (params) => {
         const queryParams = new URLSearchParams();
         if (params?.status) {
           const statusParam = params.status === 'published' ? 'uploaded' : params.status;
           queryParams.append('status', statusParam);
         }
-        if (params?.page !== undefined) {
-          queryParams.append('page', params.page.toString());
-        }
-        if (params?.pageSize !== undefined) {
-          queryParams.append('pageSize', params.pageSize.toString());
-        }
         const queryString = queryParams.toString();
-        return `/api/v1/educational-videos${queryString ? `?${queryString}` : ''}`;
+        return `/api/v1/session-videos${queryString ? `?${queryString}` : ''}`;
       },
-      providesTags: ['EducationalVideo'],
+      providesTags: ['SessionVideo'],
     }),
-    createVideo: builder.mutation<{ success: boolean; message: string; data: EducationalVideo }, CreateVideoRequest>({
+    createVideo: builder.mutation<{ success: boolean; message: string; data: SessionVideo }, CreateSessionVideoRequest>({
       query: (body) => {
         const formData = new FormData();
         formData.append('title', body.title);
         if (body.description) formData.append('description', body.description);
         if (body.status) formData.append('status', body.status);
+        if (body.symptoms && body.symptoms.length > 0) {
+          formData.append('symptoms', JSON.stringify(body.symptoms));
+        }
         formData.append('video', body.video);
         
         return {
-          url: '/api/v1/educational-videos',
+          url: '/api/v1/session-videos',
           method: 'POST',
           body: formData,
         };
       },
-      invalidatesTags: ['EducationalVideo'],
+      invalidatesTags: ['SessionVideo'],
     }),
-    updateVideo: builder.mutation<{ success: boolean; message: string; data: EducationalVideo }, UpdateVideoRequest>({
+    updateVideo: builder.mutation<{ success: boolean; message: string; data: SessionVideo }, UpdateSessionVideoRequest>({
       query: (body) => {
         const formData = new FormData();
         if (body.title) formData.append('title', body.title);
         if (body.description !== undefined) formData.append('description', body.description);
         if (body.status) formData.append('status', body.status);
+        if (body.symptoms !== undefined) {
+          formData.append('symptoms', JSON.stringify(body.symptoms));
+        }
         if (body.video) formData.append('video', body.video);
         
         return {
-          url: `/api/v1/educational-videos/${body.id}`,
+          url: `/api/v1/session-videos/${body.id}`,
           method: 'PUT',
           body: formData,
         };
       },
-      invalidatesTags: ['EducationalVideo'],
+      invalidatesTags: ['SessionVideo'],
     }),
     deleteVideo: builder.mutation<{ success: boolean; message: string }, string>({
       query: (id) => ({
-        url: `/api/v1/educational-videos/${id}`,
+        url: `/api/v1/session-videos/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['EducationalVideo'],
+      invalidatesTags: ['SessionVideo'],
     }),
   }),
 });
@@ -144,4 +136,5 @@ export const {
   useCreateVideoMutation,
   useUpdateVideoMutation,
   useDeleteVideoMutation,
-} = educationalVideoApi;
+} = sessionVideoApi;
+

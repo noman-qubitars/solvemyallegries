@@ -3,6 +3,7 @@ import { userApi } from './api/userApi';
 import { dailySessionApi } from './api/dailySessionApi';
 import { messageApi } from './api/messageApi';
 import { educationalVideoApi } from './api/educationalVideoApi';
+import { sessionVideoApi } from './api/sessionVideoApi';
 
 export const store = configureStore({
   reducer: {
@@ -10,13 +11,15 @@ export const store = configureStore({
     [dailySessionApi.reducerPath]: dailySessionApi.reducer,
     [messageApi.reducerPath]: messageApi.reducer,
     [educationalVideoApi.reducerPath]: educationalVideoApi.reducer,
+    [sessionVideoApi.reducerPath]: sessionVideoApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       userApi.middleware,
       dailySessionApi.middleware,
       messageApi.middleware,
-      educationalVideoApi.middleware
+      educationalVideoApi.middleware,
+      sessionVideoApi.middleware
     ),
 });
 

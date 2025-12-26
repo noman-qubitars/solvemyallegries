@@ -32,6 +32,12 @@ const Case: React.FC = () => {
                     centerPadding: "10%",
                 },
             },
+            {
+                breakpoint: 640,
+                settings: {
+                    centerPadding: "0%",
+                },
+            },
         ],
     };
 
@@ -80,14 +86,14 @@ const Case: React.FC = () => {
                             </div>
                             {/* IMPACT & OUTCOME */}
                             <div className="flex justify-between flex-col w-[100px] sm:w-[200px] lg:w-[260px] xl:w-[262px] 2xl:w-[300px]">
-                                <div className="bg-green-100 px-[12px] py-[12px] sm:px-[16px] sm:py-[14px] lg:px-[18px] lg:py-[16px] xl:px-[20px] xl:py-[18px] 2xl:px-[28px] 2xl:py-[21px] rounded-lg xl:h-[8.9rem] 2xl:h-[10.5rem]">
+                                <div className="bg-green-100 px-[12px] py-[12px] sm:px-[16px] sm:py-[14px] lg:px-[18px] lg:py-[16px] xl:px-[20px] xl:py-[18px] 2xl:px-[20px] 2xl:py-[20px] rounded-lg">
                                     <h4 className="font-bold font-poppins text-black-100 text-[12px] sm:text-[16px]">{item.impact.title}</h4>
-                                    <p className="mt-[4px] sm:mt-[6px] xl:mt-[10px] 2xl:mt-[17px] font-poppins font-normal text-[8px] text-black-100 sm:text-[8px] lg:text-[10px] xl:text-[12px] 2xl:text-[16px]">{item.impact.description}</p>
+                                    <p className="mt-[4px] sm:mt-[6px] xl:mt-[10px] 2xl:mt-[8px] font-poppins font-normal text-[8px] text-black-100 sm:text-[8px] lg:text-[10px] xl:text-[12px] 2xl:text-[16px]">{item.impact.description}</p>
                                 </div>
-                                <div className="btn-gradient-border rounded-lg xl:h-[10.2rem] 2xl:h-[10.5rem]">
-                                    <div className="px-[12px] py-[12px] sm:px-[16px] sm:py-[14px] lg:px-[18px] lg:py-[16px] xl:px-[20px] xl:py-[18px] 2xl:px-[28px] 2xl:py-[21px]">
+                                <div className="btn-gradient-border rounded-lg">
+                                    <div className="px-[12px] py-[12px] sm:px-[16px] sm:py-[14px] lg:px-[18px] lg:py-[16px] xl:px-[16px] xl:py-[18px] 2xl:px-[18px] 2xl:py-[21px]">
                                         <h4 className="font-bold font-poppins text-black-100 text-[12px] sm:text-[16px]" style={{ boxShadow: "#00000040" }}>{item.outcome.title}</h4>
-                                        <p className="mt-[4px] sm:mt-[6px] xl:mt-[10px] 2xl:mt-[17px] font-poppins font-normal text-[8px] text-black-100 sm:text-[8px] lg:text-[10px] xl:text-[12px] 2xl:text-[16px]">{item.outcome.description}</p>
+                                        <p className="mt-[4px] sm:mt-[6px] xl:mt-[10px] 2xl:mt-[10px] font-poppins font-normal text-[8px] text-black-100 sm:text-[8px] lg:text-[10px] xl:text-[12px] 2xl:text-[16px]">{item.outcome.description}</p>
                                     </div>
                                 </div>
                             </div>

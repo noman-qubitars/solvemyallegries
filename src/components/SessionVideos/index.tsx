@@ -1,169 +1,153 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import BreadCrum from "./BreadCrum";
 import Upload from "./Upload/Upload";
 import Drafts from "./Drafts/Drafts";
 import Yoga from "./Upload/Yoga";
 import Modal from "./Modal";
 import YogaDraft from "./Drafts/YogaDraft";
+import DeleteVideoModal from "./DeleteVideoModal";
+import {
+  useGetVideosQuery,
+  useCreateVideoMutation,
+  useUpdateVideoMutation,
+  useDeleteVideoMutation,
+  SessionVideo
+} from "@/lib/api/sessionVideoApi";
+import { useToaster } from "@/components/Toaster";
 
-const EducationalVideos: React.FC = () => {
-
+const SessionVideos: React.FC = () => {
+  const { showToast } = useToaster();
   const [activeIndex, setActiveIndex] = useState(0);
   const [showUpload, setShowUpload] = useState(true);
   const [searchVideo, setSearchVideo] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const initialFormData = {
-    title: "",
-    description: "",
-    symptoms: [] as string[],
-    videos: [] as File[],
-  };
-  const [formDataList, setFormDataList] = useState<typeof initialFormData[]>([]);
-  const [drafts, setDrafts] = useState<typeof initialFormData[]>([]);
-  const [currentForm, setCurrentForm] = useState<typeof initialFormData>({ ...initialFormData });
-  const [editingSource, setEditingSource] = useState<"upload" | "draft" | null>(null);
+  const [editingVideo, setEditingVideo] = useState<SessionVideo | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [newSymptom, setNewSymptom] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [videoToDelete, setVideoToDelete] = useState<{ video: SessionVideo; source: "upload" | "draft" } | null>(null);
+  const uploadedErrorShownRef = useRef(false);
+  const draftErrorShownRef = useRef(false);
+
+  const { data: uploadedVideosData, error: uploadedError, refetch: refetchUploaded } = useGetVideosQuery(
+    { status: 'uploaded' }
+  );
+
+  const { data: draftVideosData, error: draftError, refetch: refetchDrafts } = useGetVideosQuery(
+    { status: 'draft' }
+  );
+
+  const [createVideo, { isLoading: creating }] = useCreateVideoMutation();
+  const [updateVideo, { isLoading: updating }] = useUpdateVideoMutation();
+  const [deleteVideo] = useDeleteVideoMutation();
+
+  const uploadedVideos = uploadedVideosData?.data || [];
+  const drafts = draftVideosData?.data || [];
+
+  useEffect(() => {
+    if (uploadedVideosData?.success) {
+      uploadedErrorShownRef.current = false;
+    } else if (uploadedError && !uploadedErrorShownRef.current) {
+      uploadedErrorShownRef.current = true;
+      showToast("Failed to fetch uploaded videos", "error");
+    }
+  }, [uploadedVideosData, uploadedError, showToast]);
+
+  useEffect(() => {
+    if (draftVideosData?.success) {
+      draftErrorShownRef.current = false;
+    } else if (draftError && !draftErrorShownRef.current) {
+      draftErrorShownRef.current = true;
+      showToast("Failed to fetch draft videos", "error");
+    }
+  }, [draftVideosData, draftError, showToast]);
 
   const handleOpenModal = () => {
-    setCurrentForm({ ...initialFormData });
-    setEditingIndex(null);
+    setEditingVideo(null);
     setIsModalOpen(true);
   };
 
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const handleCloseModal = () => {
-    setCurrentForm({ ...initialFormData });
+    setEditingVideo(null);
     setIsModalOpen(false);
   };
 
-  const handleChange = (field: string, value: string) => {
-    if (field === "Symptoms Tags") {
-      const trimmed = value.trim();
-      if (trimmed && !currentForm.symptoms.includes(trimmed)) {
-        setCurrentForm((prev) => ({
-          ...prev,
-          symptoms: [...prev.symptoms, trimmed],
-        }));
-      }
-      setNewSymptom("");
-    } else {
-      setCurrentForm((prev) => ({
-        ...prev,
-        [field === "Title" ? "title" : field === "Description" ? "description" : field]: value,
-      }));
-    }
-  };
-
-  const handleRemoveSymptom = (symptomToRemove: string) => {
-    setCurrentForm((prev) => ({
-      ...prev,
-      symptoms: prev.symptoms.filter(symptom => symptom !== symptomToRemove),
-    }));
-  };
-
-  const handleVideoUpload = (files: FileList | null) => {
-    if (!files) return;
-    const file = Array.from(files).find((file) => file.type === "video/mp4");
-    if (file) {
-      setCurrentForm((prev) => ({
-        ...prev,
-        videos: [file],
-      }));
-    }
-  };
-
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    handleVideoUpload(e.dataTransfer.files);
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleVideoUpload(e.target.files);
-  };
-
-  const handleRemoveVideo = (index: number) => {
-    setCurrentForm((prev) => ({
-      ...prev,
-      videos: prev.videos.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleUpload = () => {
-    if (
-      currentForm.title.trim() === "" &&
-      currentForm.description.trim() === "" &&
-      currentForm.videos.length === 0
-    ) {
-      setIsModalOpen(false);
-      return;
-    }
-
-    if (editingIndex !== null && editingSource !== null) {
-      if (editingSource === "upload") {
-        setFormDataList((prev) =>
-          prev.map((item, idx) => (idx === editingIndex ? currentForm : item))
-        );
+  const handleSubmit = async (values: { title: string; description: string; symptoms: string[]; videos: File[] }, isDraft: boolean) => {
+    try {
+      if (editingVideo) {
+        await updateVideo({
+          id: editingVideo._id,
+          title: values.title,
+          description: values.description,
+          symptoms: values.symptoms,
+          status: isDraft ? "draft" : "uploaded",
+          video: values.videos[0],
+        }).unwrap();
       } else {
-        setDrafts((prev) =>
-          prev.map((item, idx) => (idx === editingIndex ? currentForm : item))
-        );
+        await createVideo({
+          title: values.title,
+          description: values.description,
+          symptoms: values.symptoms,
+          status: isDraft ? "draft" : "uploaded",
+          video: values.videos[0],
+        }).unwrap();
       }
-    } else {
-      setFormDataList((prev) => [...prev, currentForm]);
-    }
 
-    setCurrentForm({ ...initialFormData });
-    setEditingIndex(null);
-    setEditingSource(null);
-    setIsModalOpen(false);
-  };
-
-  const handleSaveDraft = () => {
-    if (
-      currentForm.title.trim() === "" &&
-      currentForm.description.trim() === "" &&
-      currentForm.videos.length === 0
-    ) {
       setIsModalOpen(false);
-      return;
+      setEditingVideo(null);
+      showToast(isDraft ? "Draft saved successfully" : "Video uploaded successfully", "success");
+
+      setTimeout(() => {
+        try {
+          refetchUploaded();
+        } catch (error) {
+        }
+        try {
+          refetchDrafts();
+        } catch (error) {
+        }
+      }, 100);
+    } catch (error: any) {
+      const errorMessage = error?.data?.message || `Failed to ${isDraft ? 'save draft' : 'upload video'}`;
+      showToast(errorMessage, "error");
     }
-    if (editingIndex !== null && editingSource !== null) {
-      if (editingSource === "upload") {
-        setDrafts((prev) =>
-          prev.map((item, idx) => (idx === editingIndex ? currentForm : item))
-        );
-      } else {
-        setDrafts((prev) =>
-          prev.map((item, idx) => (idx === editingIndex ? currentForm : item))
-        );
-      }
-    } else {
-      setDrafts((prev) => [...prev, currentForm]);
-    }
-    setCurrentForm({ ...initialFormData });
-    setEditingIndex(null);
-    setEditingSource(null);
-    setIsModalOpen(false);
   };
 
   const handleEdit = (index: number, source: "upload" | "draft") => {
-    const listToEdit = source === "upload" ? formDataList : drafts;
-    const formToEdit = listToEdit[index];
-    setCurrentForm(formToEdit);
-    setEditingIndex(index);
-    setEditingSource(source);
+    const listToEdit = source === "upload" ? uploadedVideos : drafts;
+    setEditingVideo(listToEdit[index]);
     setIsModalOpen(true);
   };
 
-  const handleDelete = (index: number, source: "upload" | "draft") => {
-    if (source === "upload") {
-      setFormDataList((prev) => prev.filter((_, i) => i !== index));
-    } else {
-      setDrafts((prev) => prev.filter((_, i) => i !== index));
+  const handleDeleteClick = (index: number, source: "upload" | "draft") => {
+    const listToEdit = source === "upload" ? uploadedVideos : drafts;
+    setVideoToDelete({ video: listToEdit[index], source });
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!videoToDelete) return;
+
+    try {
+      await deleteVideo(videoToDelete.video._id).unwrap();
+      showToast("Video deleted successfully", "success");
+      setIsDeleteModalOpen(false);
+      setVideoToDelete(null);
+
+      setTimeout(() => {
+        try {
+          refetchUploaded();
+        } catch (error) {
+        }
+        try {
+          refetchDrafts();
+        } catch (error) {
+        }
+      }, 100);
+    } catch (error: any) {
+      const errorMessage = error?.data?.message || "Failed to delete video";
+      showToast(errorMessage, "error");
     }
   };
 
@@ -172,10 +156,10 @@ const EducationalVideos: React.FC = () => {
     setShowUpload(false);
   };
 
-  const EducationalBtnData = [
+  const SessionBtnData = [
     {
       label: "Upload",
-      number: formDataList.length > 0 ? `(${formDataList.length})` : "",
+      number: uploadedVideos.length > 0 ? `(${uploadedVideos.length})` : "",
     },
     {
       label: "Drafts",
@@ -189,7 +173,7 @@ const EducationalVideos: React.FC = () => {
       <BreadCrum onSearch={setSearchVideo} onOpen={handleOpenModal} />
       <div className="mt-4">
         <div className="flex items-center gap-2">
-          {EducationalBtnData.map((item, index) => (
+          {SessionBtnData.map((item, index) => (
             <button
               key={index}
               onClick={() => setActiveIndex(index)}
@@ -202,34 +186,36 @@ const EducationalVideos: React.FC = () => {
           ))}
         </div>
         {activeIndex === 0 && (showUpload ?
-          <Upload formData={formDataList} searchTerm={searchVideo} onEdit={(index) => handleEdit(index, "upload")}
-            onDelete={(index) => handleDelete(index, "upload")} onSelectCard={handleSelectCard} />
+          <Upload videos={uploadedVideos} searchTerm={searchVideo} onEdit={(index) => handleEdit(index, "upload")}
+            onDelete={(index) => handleDeleteClick(index, "upload")} onSelectCard={handleSelectCard} />
           :
-          <Yoga formData={formDataList} index={selectedIndex} goBack={() => setShowUpload(true)} onDelete={(index) => handleDelete(index, "upload")} onEdit={(index) => handleEdit(index, "upload")} />
+          <Yoga videos={uploadedVideos} index={selectedIndex} goBack={() => setShowUpload(true)} onDelete={(index) => handleDeleteClick(index, "upload")} onEdit={(index) => handleEdit(index, "upload")} />
         )}
         {activeIndex === 1 && (showUpload ?
           <Drafts drafts={drafts} onEdit={(index) => handleEdit(index, "draft")}
-            onDelete={(index) => handleDelete(index, "draft")} searchTerm={searchVideo} onSelectCard={handleSelectCard} />
+            onDelete={(index) => handleDeleteClick(index, "draft")} searchTerm={searchVideo} onSelectCard={handleSelectCard} />
           :
-          <YogaDraft formData={drafts} index={selectedIndex} goBack={() => setShowUpload(true)} onDelete={(index) => handleDelete(index, "upload")} onEdit={(index) => handleEdit(index, "upload")} />
+          <YogaDraft videos={drafts} index={selectedIndex} goBack={() => setShowUpload(true)} onDelete={(index) => handleDeleteClick(index, "draft")} onEdit={(index) => handleEdit(index, "draft")} />
         )}
       </div>
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        formData={currentForm}
-        handleChange={handleChange}
-        handleDrop={handleDrop}
-        handleFileSelect={handleFileSelect}
-        handleRemoveVideo={handleRemoveVideo}
-        handleSave={handleUpload}
-        handleSaveDraft={handleSaveDraft}
-        newSymptom={newSymptom}
-        setNewSymptom={setNewSymptom}
-        handleRemoveSymptom={handleRemoveSymptom}
+        editingVideo={editingVideo}
+        onSubmit={handleSubmit}
+        isLoading={creating || updating}
+      />
+      <DeleteVideoModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setVideoToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        videoTitle={videoToDelete?.video.title || ""}
       />
     </div>
   );
 };
 
-export default EducationalVideos;
+export default SessionVideos;

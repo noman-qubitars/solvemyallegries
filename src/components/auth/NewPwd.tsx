@@ -16,7 +16,6 @@ const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
   headers: {
     'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
   },
 });
 
@@ -44,7 +43,7 @@ const NewPassword = () => {
 
   const handleResetPassword = async (values: typeof initialValues, { setSubmitting }: any) => {
     try {
-      const response = await api.post('/auth/reset-password', {
+      const response = await api.post('/api/v1/auth/reset-password', {
         email: email,
         password: values.password,
       });

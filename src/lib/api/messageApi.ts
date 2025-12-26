@@ -24,7 +24,6 @@ const baseQuery = fetchBaseQuery({
     if (endpoint !== 'sendMessage') {
       headers.set('Content-Type', 'application/json');
     }
-    headers.set('ngrok-skip-browser-warning', 'true');
     return headers;
   },
 });
@@ -86,12 +85,12 @@ export const messageApi = createApi({
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.limit) queryParams.append('limit', params.limit.toString());
         const queryString = queryParams.toString();
-        return `/api/messages${queryString ? `?${queryString}` : ''}`;
+        return `/api/v1/messages${queryString ? `?${queryString}` : ''}`;
       },
       providesTags: ['Message'],
     }),
     getUserMessages: builder.query<{ success: boolean; data: Message[]; total: number }, string>({
-      query: (userId) => `/api/messages/user/${userId}`,
+      query: (userId) => `/api/v1/messages/user/${userId}`,
       providesTags: ['Message'],
     }),
     sendMessage: builder.mutation<{ success: boolean; message: string; data: Message }, SendMessageParams>({
@@ -103,7 +102,7 @@ export const messageApi = createApi({
         if (params.userId) formData.append('userId', params.userId);
 
         return {
-          url: '/api/messages/send',
+          url: '/api/v1/messages/send',
           method: 'POST',
           body: formData,
         };
@@ -112,7 +111,7 @@ export const messageApi = createApi({
     }),
     markAsRead: builder.mutation<{ success: boolean; message: string; modifiedCount: number }, { messageIds: string[] }>({
       query: (body) => ({
-        url: '/api/messages/mark-read',
+        url: '/api/v1/messages/mark-read',
         method: 'PUT',
         body,
       }),
@@ -120,14 +119,14 @@ export const messageApi = createApi({
     }),
     deleteMessage: builder.mutation<{ success: boolean; message: string }, string>({
       query: (messageId) => ({
-        url: `/api/messages/${messageId}`,
+        url: `/api/v1/messages/${messageId}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['Message'],
     }),
     deleteAllMessages: builder.mutation<{ success: boolean; message: string; deletedCount: number }, { userId: string }>({
       query: (body) => ({
-        url: '/api/messages/chat/all',
+        url: '/api/v1/messages/chat/all',
         method: 'DELETE',
         body,
       }),

@@ -15,7 +15,6 @@ const baseQuery = fetchBaseQuery({
       headers.set('authorization', `Bearer ${token}`);
     }
     headers.set('Content-Type', 'application/json');
-    headers.set('ngrok-skip-browser-warning', 'true');
     return headers;
   },
 });
@@ -45,6 +44,8 @@ export interface User {
   status: string;
   activity: string;
   role: "user" | "admin";
+  isOnline?: boolean;
+  lastSessionEnd?: string;
 }
 
 export const userApi = createApi({
@@ -53,16 +54,16 @@ export const userApi = createApi({
   tagTypes: ['User'],
   endpoints: (builder) => ({
     getUsers: builder.query<{ success: boolean; data: User[] }, void>({
-      query: () => '/api/users',
+      query: () => '/api/v1/users',
       providesTags: ['User'],
     }),
     getUserById: builder.query<{ success: boolean; data: User }, string>({
-      query: (userId) => `/api/users/${userId}`,
+      query: (userId) => `/api/v1/users/${userId}`,
       providesTags: ['User'],
     }),
     toggleUserStatus: builder.mutation({
       query: (userId: string) => ({
-        url: `/api/users/${userId}/block`,
+        url: `/api/v1/users/${userId}/block`,
         method: 'PUT',
       }),
       invalidatesTags: ['User'],
