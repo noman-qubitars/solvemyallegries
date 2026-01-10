@@ -1,5 +1,6 @@
 "use client"
-import React, { useState, useMemo } from "react";
+
+import { useState, useMemo } from "react";
 import Highcharts from "highcharts"
 import HighchartsReact from "highcharts-react-official"
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
@@ -191,7 +192,7 @@ const SymptomsChart: React.FC<SymptomsChartProps> = ({ sessions }) => {
                     {dropdownOpen && (
                         <div className="absolute right-[5px] top-[15px] z-50 border border-[#DFDFDF] mt-2 w-[95px] bg-white shadow-lg rounded-lg">
                             <button
-                                className="w-full cursor-pointer flex items-center pl-[12px] py-[10px] text-[#717171] font-medium"
+                                className="w-full cursor-pointer flex items-center pl-[12px] py-[10px] text-gray-50 font-medium"
                                 onClick={() => {
                                     setIsFullScreen((prev) => !prev);
                                     setDropdownOpen(false);

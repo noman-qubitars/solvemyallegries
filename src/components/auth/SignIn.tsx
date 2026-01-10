@@ -135,7 +135,7 @@ const SignIn = () => {
                     onClick={() => setShowPassword((prev) => !prev)}
                     className="text-gray-400 px-4 cursor-pointer shrink-0"
                   >
-                    {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
+                    {showPassword ? <IoEyeOutline /> : <IoEyeOffOutline />}
                   </span>
                 </div>
               </div>

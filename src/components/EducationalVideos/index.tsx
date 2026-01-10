@@ -33,20 +33,42 @@ const EducationalVideos: React.FC = () => {
   const [draftPage, setDraftPage] = useState(1);
   const pageSize = 10;
 
+  // Fetch all videos without pagination
   const { data: uploadedVideosData, error: uploadedError, refetch: refetchUploaded } = useGetVideosQuery(
-    { status: 'uploaded', page: uploadedPage, pageSize }
+    { status: 'uploaded' }
   );
 
   const { data: draftVideosData, error: draftError, refetch: refetchDrafts } = useGetVideosQuery(
-    { status: 'draft', page: draftPage, pageSize }
+    { status: 'draft' }
   );
 
   const [createVideo, { isLoading: creating }] = useCreateVideoMutation();
   const [updateVideo, { isLoading: updating }] = useUpdateVideoMutation();
   const [deleteVideo] = useDeleteVideoMutation();
 
-  const uploadedVideos = uploadedVideosData?.data || [];
-  const drafts = draftVideosData?.data || [];
+  // Get all videos
+  const allUploadedVideos = uploadedVideosData?.data || [];
+  const allDrafts = draftVideosData?.data || [];
+
+  // Filter videos based on search term
+  const filteredUploadedVideos = allUploadedVideos.filter(video =>
+    video.title.toLowerCase().includes(searchVideo.toLowerCase())
+  );
+  const filteredDrafts = allDrafts.filter(draft =>
+    draft.title.toLowerCase().includes(searchVideo.toLowerCase())
+  );
+
+  // Client-side pagination for uploaded videos (after filtering)
+  const uploadedStartIndex = (uploadedPage - 1) * pageSize;
+  const uploadedEndIndex = uploadedStartIndex + pageSize;
+  const uploadedVideos = filteredUploadedVideos.slice(uploadedStartIndex, uploadedEndIndex);
+  const uploadedTotalPages = Math.ceil(filteredUploadedVideos.length / pageSize);
+
+  // Client-side pagination for drafts (after filtering)
+  const draftStartIndex = (draftPage - 1) * pageSize;
+  const draftEndIndex = draftStartIndex + pageSize;
+  const drafts = filteredDrafts.slice(draftStartIndex, draftEndIndex);
+  const draftTotalPages = Math.ceil(filteredDrafts.length / pageSize);
   
   useEffect(() => {
     if (searchVideo) {
@@ -54,6 +76,19 @@ const EducationalVideos: React.FC = () => {
       setDraftPage(1);
     }
   }, [searchVideo]);
+
+  // Reset to page 1 when videos change (after delete, create, update)
+  useEffect(() => {
+    if (uploadedPage > uploadedTotalPages && uploadedTotalPages > 0) {
+      setUploadedPage(1);
+    }
+  }, [uploadedTotalPages, uploadedPage]);
+
+  useEffect(() => {
+    if (draftPage > draftTotalPages && draftTotalPages > 0) {
+      setDraftPage(1);
+    }
+  }, [draftTotalPages, draftPage]);
 
   useEffect(() => {
     if (uploadedVideosData?.success) {
@@ -125,14 +160,22 @@ const EducationalVideos: React.FC = () => {
   };
 
   const handleEdit = (index: number, source: "upload" | "draft") => {
-    const listToEdit = source === "upload" ? uploadedVideos : drafts;
-    setEditingVideo(listToEdit[index]);
+    // Calculate the actual index in the filtered array
+    const actualIndex = source === "upload" 
+      ? uploadedStartIndex + index 
+      : draftStartIndex + index;
+    const listToEdit = source === "upload" ? filteredUploadedVideos : filteredDrafts;
+    setEditingVideo(listToEdit[actualIndex]);
     setIsModalOpen(true);
   };
 
   const handleDeleteClick = (index: number, source: "upload" | "draft") => {
-    const listToDelete = source === "upload" ? uploadedVideos : drafts;
-    const video = listToDelete[index];
+    // Calculate the actual index in the filtered array
+    const actualIndex = source === "upload" 
+      ? uploadedStartIndex + index 
+      : draftStartIndex + index;
+    const listToDelete = source === "upload" ? filteredUploadedVideos : filteredDrafts;
+    const video = listToDelete[actualIndex];
     setVideoToDelete({ video, source });
     setIsDeleteModalOpen(true);
   };
@@ -169,8 +212,12 @@ const EducationalVideos: React.FC = () => {
     setVideoToDelete(null);
   };
 
-  const handleSelectCard = (index: number) => {
-    setSelectedIndex(index);
+  const handleSelectCard = (index: number, source: "upload" | "draft") => {
+    // Calculate the actual index in the full array
+    const actualIndex = source === "upload" 
+      ? uploadedStartIndex + index 
+      : draftStartIndex + index;
+    setSelectedIndex(actualIndex);
     setShowUpload(false);
   };
 
@@ -205,17 +252,17 @@ const EducationalVideos: React.FC = () => {
         {activeIndex === 0 && (showUpload ?
           <Upload
             videos={uploadedVideos}
-            searchTerm={searchVideo}
+            searchTerm=""
             onEdit={(index) => handleEdit(index, "upload")}
             onDelete={(index) => handleDeleteClick(index, "upload")}
-            onSelectCard={handleSelectCard}
+            onSelectCard={(index) => handleSelectCard(index, "upload")}
             currentPage={uploadedPage}
-            totalPages={uploadedVideosData?.totalPages || 1}
+            totalPages={uploadedTotalPages}
             onPageChange={setUploadedPage}
           />
           :
           <Yoga
-            videos={uploadedVideos}
+            videos={allUploadedVideos}
             index={selectedIndex}
             goBack={() => setShowUpload(true)}
             onDelete={(index) => handleDeleteClick(index, "upload")}
@@ -227,15 +274,15 @@ const EducationalVideos: React.FC = () => {
             drafts={drafts}
             onEdit={(index) => handleEdit(index, "draft")}
             onDelete={(index) => handleDeleteClick(index, "draft")}
-            searchTerm={searchVideo}
-            onSelectCard={handleSelectCard}
+            searchTerm=""
+            onSelectCard={(index) => handleSelectCard(index, "draft")}
             currentPage={draftPage}
-            totalPages={draftVideosData?.totalPages || 1}
+            totalPages={draftTotalPages}
             onPageChange={setDraftPage}
           />
           :
           <YogaDraft
-            videos={drafts}
+            videos={allDrafts}
             index={selectedIndex}
             goBack={() => setShowUpload(true)}
             onDelete={(index) => handleDeleteClick(index, "draft")}

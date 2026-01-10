@@ -77,7 +77,6 @@ const JournalsAnalysis: React.FC = () => {
         setOpenDropdownIndex(null);
     };
 
-
     return (
         <div className="">
             <h1 className="text-[#11401C] font-semibold text-[24px]">Journals Analysis</h1>
@@ -89,7 +88,7 @@ const JournalsAnalysis: React.FC = () => {
                         className="bg-white p-4 rounded-[14px] shadow-md flex flex-col gap-2"
                     >
                         <div className="flex justify-between items-center">
-                            <h3 className="font-medium sm:w-[10rem] md:w-auto lg:w-[10rem] text-[#636466]">{item.name}</h3>
+                            <h3 className="font-medium sm:w-40 md:w-auto lg:w-40 text-[#636466]">{item.name}</h3>
                             <div className={`px-[14px] py-[18px] h-[60px] flex items-center justify-center rounded-[23px] ${bgColors[index]}`}>
                                 <Image
                                     src={item.image}
@@ -138,13 +137,13 @@ const JournalsAnalysis: React.FC = () => {
                         <tbody className="bg-white divide-y divide-[#CCCCCC]">
                             {filteredData.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="text-center text-[#222222] font-medium py-2">
+                                    <td colSpan={7} className="text-center text-black-100 font-medium py-2">
                                         No Data Available
                                     </td>
                                 </tr>
                             ) : (
                                 currentItems.map((user, index) => (
-                                    <tr key={index} className="hover:bg-gray-50">
+                                    <tr key={index} className="hover:bg-gray-50/25">
                                         <td className="px-4 py-4">
                                             <label className="inline-flex items-center cursor-pointer">
                                                 <input
@@ -165,11 +164,11 @@ const JournalsAnalysis: React.FC = () => {
                                         <td className="px-4 py-4 text-[#484C52] font-medium text-[14px] whitespace-nowrap">{user.symptom}</td>
                                         <td className="px-4 py-4 flex justify-center whitespace-nowrap">
                                             <div ref={dropdownRef} data-dropdown-index={index}>
-                                                <button className="text-[#000000] cursor-pointer" onClick={() => toggleDropdown(index)}>
+                                                <button className="text-black cursor-pointer" onClick={() => toggleDropdown(index)}>
                                                     <user.icon className="w-5 h-5" />
                                                 </button>
                                                 {openDropdownIndex === index && (
-                                                    <div className="absolute right-[3rem] mt-0 w-[84px] bg-white rounded-[6px] shadow-lg border border-[#B3B3B3] z-50">
+                                                    <div className="absolute right-12 mt-0 w-[84px] bg-white rounded-[6px] shadow-lg border border-[#B3B3B3] z-50">
                                                         <button
                                                             onClick={(e) => {
                                                                 e.stopPropagation();

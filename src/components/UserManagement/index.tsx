@@ -253,19 +253,19 @@ const UserManagement: React.FC = () => {
             <tbody className="bg-white divide-y divide-[#CCCCCC]">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="text-center text-[#222222] font-medium py-8">
+                  <td colSpan={5} className="text-center text-black-100 font-medium py-8">
                     Loading...
                   </td>
                 </tr>
               ) : filteredData.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center text-[#222222] font-medium py-2">
+                  <td colSpan={5} className="text-center text-black-100 font-medium py-2">
                     No Data Available
                   </td>
                 </tr>
               ) : (
                 currentItems.map((user, index) => (
-                  <tr key={index} className="hover:bg-gray-50/20">
+                  <tr key={index} className="hover:bg-gray-50/25">
                     {/* <td className="px-4 py-4">
                       <label className="inline-flex items-center cursor-pointer">
                         <input
@@ -304,7 +304,7 @@ const UserManagement: React.FC = () => {
                         <p className="text-[12px] font-normal text-[#808080]">{user.email}</p>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-[#222222] font-medium text-[14px] whitespace-nowrap">{user.date}</td>
+                    <td className="px-4 py-4 text-black-100 font-medium text-[14px] whitespace-nowrap">{user.date}</td>
                     <td className="px-4 py-4 flex justify-center whitespace-nowrap">
                       <div
                         className={`flex items-center gap-2 px-[22px] w-fit py-[10px] rounded-[12px] text-[14px] font-medium ${
@@ -319,31 +319,24 @@ const UserManagement: React.FC = () => {
                         {user.status === 'Blocked' ? 'Blocked' : user.status === 'inactive' ? 'Unpaid' : user.status === 'Active' ? 'Paid' : user.status}
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-[#222222] font-medium text-[14px] whitespace-nowrap">
+                    <td className="px-4 py-4 text-black-100 font-medium text-[14px] whitespace-nowrap">
                     {user.activity}
-                      <div className="flex items-center gap-2">
-                        {/* {user.isOnline && (
-                          <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                        )} */}
-                        <span></span>
-                      </div>
                     </td>
                     <td className="px-4 py-4 flex justify-center whitespace-nowrap">
                       <div ref={dropdownRef} data-dropdown-index={index}>
                         <button 
-                          className={`text-[#000000] ${user.status === 'inactive' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`} 
+                          className={`text-black ${user.status === 'inactive' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`} 
                           onClick={() => user.status !== 'inactive' && toggleDropdown(index)}
                           disabled={user.status === 'inactive'}
                         >
                           <user.icon className="w-5 h-5" />
                         </button>
                         {openDropdownIndex === index && user.status !== 'inactive' && (
-                          <div className="absolute right-[4.5rem] mt-0 w-[127px] bg-white rounded-[6px] shadow-lg border border-[#B3B3B3] z-50">
+                          <div className="absolute right-18 mt-0 w-[127px] bg-white rounded-[6px] shadow-lg border border-[#B3B3B3] z-50">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleView(user.id);
-                                console.log(user.id, "user.id>>>>>>>");
                               }}
                               className="w-full cursor-pointer flex gap-2 pl-[12px] py-[12px] text-[#11401C] font-medium border-b border-[#B3B3B3]"
                             >
@@ -354,7 +347,7 @@ const UserManagement: React.FC = () => {
                                 e.stopPropagation();
                                 toggleBlockStatus(user.id.toString(), user.email);
                               }}
-                              className="w-full cursor-pointer flex gap-2 pl-[12px] py-[12px] text-[#717171] font-medium border-b border-[#B3B3B3]"
+                              className="w-full cursor-pointer flex gap-2 pl-[12px] py-[12px] text-gray-50 font-medium border-b border-[#B3B3B3]"
                             >
                               {user.status === "Active" ? (
                                 <>

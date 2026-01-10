@@ -49,6 +49,7 @@ const UserManagementDetail: React.FC<UserManagementDetailProps> = ({ id }) => {
     const [toggleUserStatus] = useToggleUserStatusMutation();
 
     const [isOpen, setIsOpen] = useState(false);
+    const [imageError, setImageError] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const toggleDropdown = () => setIsOpen(!isOpen);
     
@@ -99,6 +100,18 @@ const UserManagementDetail: React.FC<UserManagementDetailProps> = ({ id }) => {
         return null;
     }
 
+    // Construct image URL - handle both relative paths and full URLs
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    let imageUrl = "/images/User/persons.svg";
+    if (user.image) {
+        if (user.image.startsWith('http://') || user.image.startsWith('https://')) {
+            imageUrl = user.image;
+        } else {
+            const cleanPath = user.image.startsWith('/') ? user.image : `/${user.image}`;
+            imageUrl = `${apiBaseUrl}${cleanPath}`;
+        }
+    }
+
     const status = user.status.toLowerCase();
     const profileData = [
         { label: "Full Name:", data: user.name },
@@ -112,8 +125,8 @@ const UserManagementDetail: React.FC<UserManagementDetailProps> = ({ id }) => {
     return (
         <div>
             <BreadCrum />
-            <div className="flex items-center gap-4 mt-4">
-                <div className="w-full lg:w-[69%] bg-white rounded-[12px] shadow-sm px-[22px] py-[22px]">
+            <div className="flex items-center lg:flex-row flex-col gap-4 mt-4">
+                <div className="w-full lg:w-[57%] xl:w-[70%] bg-white rounded-[12px] shadow-sm px-[16px] sm:px-[22px] lg:px-[16px] xl:px-[22px] py-[22px]">
                     <div className="flex items-center justify-between">
                         <p className="text-[#11401C] font-semibold text-[20px]">Profile</p>
                         <div className="flex items-center gap-2">
@@ -131,12 +144,12 @@ const UserManagementDetail: React.FC<UserManagementDetailProps> = ({ id }) => {
                                 {user.status}
                             </div>
                             <div className="relative" ref={dropdownRef}>
-                                <HiOutlineDotsHorizontal className="text-[#000000] text-[14px] cursor-pointer" onClick={toggleDropdown} />
+                                <HiOutlineDotsHorizontal className="text-black text-[14px] cursor-pointer" onClick={toggleDropdown} />
                                 {isOpen && (
                                     <div className="absolute right-[5px] top-[10px] z-50 border border-[#DFDFDF] mt-2 w-[127px] bg-white shadow-lg rounded-lg">
                                         <button
                                             onClick={handleStatusToggle}
-                                            className="w-full cursor-pointer flex items-center gap-2 pl-[12px] py-[12px] text-[#717171] font-medium"
+                                            className="w-full cursor-pointer flex items-center gap-2 pl-[12px] py-[12px] text-gray-50 font-medium"
                                         >
                                             {status === "active" ? (
                                                 <>
@@ -154,18 +167,36 @@ const UserManagementDetail: React.FC<UserManagementDetailProps> = ({ id }) => {
                         </div>
                     </div>
                     <div className="mt-4 flex gap-4">
-                        <Image src="/images/User/persons.svg" alt="User" width={197} height={197} />
+                        <div className="relative w-[100px] h-[100px] sm:w-[150px] lg:w-[120px] xl:w-[197px] sm:h-[150px] lg:h-[120px] xl:h-[197px] rounded-full overflow-hidden shrink-0 bg-gray-200 flex items-center justify-center">
+                            {imageError || !user.image ? (
+                                <div className="w-full h-full flex items-center justify-center bg-[#11401C] text-white text-[48px] font-semibold">
+                                    {user.name.charAt(0).toUpperCase()}
+                                </div>
+                            ) : (
+                                <Image
+                                    src={imageUrl}
+                                    alt={user.name}
+                                    width={197}
+                                    height={197}
+                                    className="object-cover rounded-full"
+                                    unoptimized
+                                    onError={() => {
+                                        setImageError(true);
+                                    }}
+                                />
+                            )}
+                        </div>
                         <div className="grid grid-cols-2 gap-3">
                             {profileData.map((item, index) => (
                                 <div key={index} className="flex flex-col gap-1">
-                                    <p className="text-[#B3B3B3] font-medium">{item.label}</p>
-                                    <p className="text-[#11401C] font-medium text-[18px]">{item.data}</p>
+                                    <p className="text-[#B3B3B3] text-[10px] sm:text-[16px] lg:text-[11px] xl:text-[16px] font-medium">{item.label}</p>
+                                    <p className="text-[#11401C] font-medium text-[18px] whitespace-nowrap overflow-hidden text-ellipsis">{item.data}</p>
                                 </div>
                             ))}
                         </div>
                     </div>
                 </div>
-                <div className="w-full lg:w-[29%] bg-white rounded-[12px] shadow-sm px-[8px] py-[12px]">
+                <div className="w-full lg:w-[40%] xl:w-[29%] bg-white rounded-[12px] shadow-sm px-[8px] py-[12px]">
                     <Calendar userId={id} sessions={sessions} />
                 </div>
             </div>

@@ -53,7 +53,7 @@ const BreadCrum: React.FC<BreadCrumProps> = ({ onSearch, setSelectedFilter, sele
             </div>
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <div className="flex items-center px-3 gap-2 border border-[#D5D5D5] rounded-full w-[388px] h-[38px] focus-within:ring-1 focus-within:ring-[#11401C] focus-within:border-[#11401C] transition-all">
+                    <div className="flex items-center px-3 gap-2 border border-[#D5D5D5] rounded-full sm:w-[388px] h-[38px] focus-within:ring-1 focus-within:ring-[#11401C] focus-within:border-[#11401C] transition-all">
                         <IoIosSearch size={20} className="text-[#8F9091]" />
                         <input
                             type="text"

@@ -23,12 +23,12 @@ const Sidebar: React.FC<Props> = ({ menus }) => {
 
   return (
     <aside className="sm:w-[250px] xl:w-[250px] 2xl:w-[250px] fixed inset-y-0 left-0 z-10 h-screen border border-[#E8E8E8] bg-white">
-      <div className="flex items-center justify-center h-[4.3rem]">
+      <div className="flex items-center justify-center h-[4.2rem]">
         <Link href="/dashboard">
           <Image src="/images/logo.svg" alt="logo" width={160} height={42} />
         </Link>
       </div>
-      <nav className="pl-4 relative py-6 space-y-3 2xl:space-y-5 overflow-y-auto scrollbar-hide h-[calc(100vh-4.3rem)]">
+      <nav className="pl-4 relative py-6 space-y-3 2xl:space-y-5 overflow-y-auto scrollbar-hide h-[calc(100vh-4.2rem)]">
         {menus.map((sidebarMenu, index) => (
           <div key={index}>
             <ul className="space-y-2">
