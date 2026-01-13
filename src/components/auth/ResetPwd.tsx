@@ -31,11 +31,8 @@ const ResetPwd = () => {
       });
 
       if (response.data.success) {
-        // Show success toast
         showToast("OTP sent to your email successfully!", "success");
-        // Store email in sessionStorage to use in OTP screen
         sessionStorage.setItem('resetEmail', values.email);
-        // Redirect to OTP screen
         setTimeout(() => {
           router.push("/otpscreen");
         }, 500);
@@ -44,7 +41,6 @@ const ResetPwd = () => {
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || 'Failed to send OTP. Please try again.';
-      // Show error toast
       showToast(errorMessage, "error");
       setSubmitting(false);
     }
@@ -56,9 +52,7 @@ const ResetPwd = () => {
         <div className="flex justify-center my-3 ">
           <Image src="/images/logo.svg" alt="Logo" width={245} height={68} />
         </div>
-        <p
-          className="text-[27px] lg:text-[31px] font-extrabold text-center mb-2"
-          style={{ wordSpacing: "-0.10em" }}>
+        <p className="text-[27px] lg:text-[31px] font-extrabold text-center mb-2 [word-spacing:-0.10em]">
           Reset Your Password.
         </p>
         <p className="text-base text-gray-600 leading-7 font-normal text-center mt-2">Forgot your password? No worries, then let's submit password reset. It will be send to your email.</p>

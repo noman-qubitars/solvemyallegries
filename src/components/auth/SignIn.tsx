@@ -38,12 +38,9 @@ const SignIn = () => {
       });
 
       if (response.data.success && response.data.token) {
-        // Show success toast
         showToast("Sign in successful! Redirecting...", "success");
-        // Store token in localStorage
         localStorage.setItem('adminToken', response.data.token);
         localStorage.setItem('adminEmail', response.data.email);
-        // Redirect to dashboard
         setTimeout(() => {
           router.push("/dashboard");
         }, 500);
@@ -53,21 +50,16 @@ const SignIn = () => {
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || 'Sign in failed. Please try again.';
       
-      // Show error toast
       showToast(errorMessage, "error");
       
-      // Determine which field has the error based on the error message
       const lowerErrorMessage = errorMessage.toLowerCase();
       if (lowerErrorMessage.includes('password') && lowerErrorMessage.includes('wrong')) {
-        // Password is wrong - set error on password field
         setErrors({ password: errorMessage, email: undefined });
         setTouched({ password: true, email: false });
       } else if (lowerErrorMessage.includes('email') && lowerErrorMessage.includes('wrong')) {
-        // Email is wrong - set error on email field
         setErrors({ email: errorMessage, password: undefined });
         setTouched({ email: true, password: false });
       } else {
-        // Default to email field if unclear
         setErrors({ email: errorMessage, password: undefined });
         setTouched({ email: true, password: false });
       }
@@ -77,15 +69,11 @@ const SignIn = () => {
 
   return (
     <div className="px-1">
-      {/* Logo */}
-      <div className="flex justify-center my-3">
+      <div className="flex justify-center my-2">
         <Image src="/images/logo.svg" alt="Logo" width={245} height={68} />
       </div>
-      {/* Heading */}
-      <div className="text-center mb-4">
-        <p
-          className="text-[27px] lg:text-[31px] font-extrabold mb-2"
-          style={{ wordSpacing: "-0.10em" }}>
+      <div className="text-center mb-3">
+        <p className="text-[27px] lg:text-[31px] font-extrabold mb-1 [word-spacing:-0.10em]">
           Sign In To Your Account.
         </p>
         <p className="text-base ext-bold text-gray-600">
@@ -93,7 +81,6 @@ const SignIn = () => {
         </p>
       </div>
 
-      {/* Form */}
       <Formik
         initialValues={initialValues}
         validationSchema={adminSigninSchema}
@@ -144,7 +131,7 @@ const SignIn = () => {
 
             <div className="flex items-center justify-between mb-4 mx-7 text-sm">
               <label className="flex items-center cursor-pointer">
-                <input type="checkbox" className="mr-2 bg-green-900 text-green-900 mt-1" />
+                <input type="checkbox" className="mr-2 accent-green-900 mt-1" />
                 Remember Me
               </label>
               <Link href="/resetpwd" className="text-green-900 hover:underline">

@@ -52,7 +52,6 @@ const UserManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const [data, setData] = useState<(UserManagementItem & { mongoId: string })[]>([]);
-  // const [selectedRows, setSelectedRows] = useState<string[]>([])
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -92,27 +91,10 @@ const UserManagement: React.FC = () => {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const itemsPerPageOptions = [10, 20, 30, 50];
 
-  // const toggleCheckbox = (email: string) => {
-  //   setSelectedRows((prev) =>
-  //     prev.includes(email)
-  //       ? prev.filter((item) => item !== email)
-  //       : [...prev, email]
-  //   )
-  // }
-
-  // const toggleAllCheckboxes = () => {
-  //   if (selectedRows.length === data.length) {
-  //     setSelectedRows([])
-  //   } else {
-  //     setSelectedRows(data.map((user) => user.email))
-  //   }
-  // }
-
   useEffect(() => {
     if (usersData?.success) {
       errorShownRef.current = false;
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-      // Filter out admin users and only show users with role "user"
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
       const transformedData = usersData.data
         .filter((user: any) => user.role === "user")
         .map((user: any) => {
@@ -188,8 +170,7 @@ const UserManagement: React.FC = () => {
             user.email === email
               ? {
                 ...user,
-                status: newStatus,
-                activity: "Just Now"
+                status: newStatus
               }
               : user
           )
@@ -220,19 +201,6 @@ const UserManagement: React.FC = () => {
           <table className="min-w-full text-sm text-center">
             <thead className="text-[#484C52] font-medium bg-white border-b border-[#CCCCCC]">
               <tr>
-                {/* <th className="px-4 py-3">
-                  <label className="inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedRows.length === data.length}
-                      onChange={toggleAllCheckboxes}
-                      className="peer hidden"
-                    />
-                    <div className="w-4 h-4 rounded border border-[#828282] bg-white flex items-center justify-center peer-checked:border-[#21BA45] peer-checked:bg-[#21BA45]">
-                      <Image src="/images/User/tick.svg" alt="check" width={12} height={7} />
-                    </div>
-                  </label>
-                </th> */}
                 <th
                   className={`px-4 py-3 cursor-pointer whitespace-nowrap flex items-center justify-between ${sortOrder === 'asc' ? 'bg-[#F2F3F7]' : ''}`}
                   onClick={handleSort}
@@ -266,19 +234,6 @@ const UserManagement: React.FC = () => {
               ) : (
                 currentItems.map((user, index) => (
                   <tr key={index} className="hover:bg-gray-50/25">
-                    {/* <td className="px-4 py-4">
-                      <label className="inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedRows.includes(user.email)}
-                          onChange={() => toggleCheckbox(user.email)}
-                          className="peer hidden"
-                        />
-                        <div className="w-4 h-4 rounded border border-[#828282] bg-white flex items-center justify-center peer-checked:border-[#21BA45] peer-checked:bg-[#21BA45]">
-                          <Image src="/images/User/tick.svg" alt="check" width={12} height={7} />
-                        </div>
-                      </label>
-                    </td> */}
                     <td className="px-4 py-4 flex items-center gap-3 text-left whitespace-nowrap">
                       <div className="relative w-[25px] h-[25px] rounded-full overflow-hidden shrink-0 bg-gray-200">
                         {imageErrors[user.id] ? (

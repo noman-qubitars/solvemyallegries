@@ -27,7 +27,6 @@ const NewPassword = () => {
   const { showToast } = useToaster();
 
   useEffect(() => {
-    // Get email from sessionStorage
     const storedEmail = typeof window !== 'undefined' ? sessionStorage.getItem('resetEmail') || '' : '';
     if (!storedEmail) {
       router.push('/resetpwd');
@@ -71,9 +70,7 @@ const NewPassword = () => {
           <Image src="/images/logo.svg" alt="Logo" width={245} height={68} />
         </div>
         <div className="text-center mb-4">
-          <p
-            className="text-[27px] lg:text-[31px] font-extrabold mb-2"
-            style={{ wordSpacing: "-0.10em" }}>
+          <p className="text-[27px] lg:text-[31px] font-extrabold mb-2 [word-spacing:-0.10em]">
             Enter New Password.
           </p>
           <p className="text-base yext-bold text-gray-600">
@@ -104,7 +101,7 @@ const NewPassword = () => {
                       onClick={() => setShowPassword((prev) => !prev)}
                       className="text-gray-400 px-4 cursor-pointer shrink-0"
                     >
-                      {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
+                      {showPassword ? <IoEyeOutline />  : <IoEyeOffOutline />}
                     </span>
                   </div>
                 </div>
@@ -127,7 +124,7 @@ const NewPassword = () => {
                       onClick={() => setShowConfirmPassword((prev) => !prev)}
                       className="text-gray-400 px-4 cursor-pointer shrink-0"
                     >
-                      {showConfirmPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
+                      {showConfirmPassword ? <IoEyeOutline /> : <IoEyeOffOutline />}
                     </span>
                   </div>
                 </div>
