@@ -65,11 +65,21 @@ const Upload: React.FC<UploadProps> = ({ videos, onEdit, onDelete, searchTerm, o
                     {filteredVideos.map((video, cardIndex) => (
                         <div key={video._id} className="border border-[#B1A9A9] rounded-lg cursor-pointer flex flex-col" onClick={() => onSelectCard(cardIndex)}>
                             <div className="relative">
-                                <video
-                                    src={`${apiUrl}${video.videoUrl}`}
-                                    className="w-full h-[169px] rounded-tl-lg rounded-tr-lg object-cover"
-                                    preload="metadata"
-                                />
+                                {video.thumbnailUrl ? (
+                                    <Image
+                                        src={video.thumbnailUrl}
+                                        alt={video.title}
+                                        width={300}
+                                        height={169}
+                                        className="w-full h-[169px] rounded-tl-lg rounded-tr-lg object-cover"
+                                    />
+                                ) : (
+                                    <video
+                                        src={video.videoUrl.startsWith('http') ? video.videoUrl : `${apiUrl}${video.videoUrl}`}
+                                        className="w-full h-[169px] rounded-tl-lg rounded-tr-lg object-cover"
+                                        preload="metadata"
+                                    />
+                                )}
                                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                     <Image src="/images/Educational/play.svg" alt="play" width={26} height={26} />
                                 </div>
