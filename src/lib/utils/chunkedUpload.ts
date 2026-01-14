@@ -39,17 +39,13 @@ export const uploadChunk = async (
   presignedUrl: string,
   chunk: Blob
 ): Promise<string> => {
-  // Remove checksum parameters from URL if present (they're optional for presigned URLs)
-  const url = new URL(presignedUrl);
-  url.searchParams.delete('x-amz-checksum-crc32');
-  url.searchParams.delete('x-amz-sdk-checksum-algorithm');
-  const cleanUrl = url.toString();
-
-  const response = await fetch(cleanUrl, {
+  // Use the presigned URL exactly as provided - don't modify it
+  // The URL is signed and any modification will break the signature
+  const response = await fetch(presignedUrl, {
     method: 'PUT',
     body: chunk,
-    // Don't set Content-Type for multipart upload parts
-    // The Content-Type is set during CreateMultipartUpload
+    // Don't set any headers - the presigned URL handles authentication
+    // Content-Type is set during CreateMultipartUpload, not on individual parts
   });
 
   if (!response.ok) {
