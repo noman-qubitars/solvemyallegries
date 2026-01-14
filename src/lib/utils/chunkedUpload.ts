@@ -37,28 +37,34 @@ export const splitFileIntoChunks = (file: File): Blob[] => {
  */
 export const uploadChunk = async (
   presignedUrl: string,
-  chunk: Blob,
-  mimetype: string
+  chunk: Blob
 ): Promise<string> => {
-  const response = await fetch(presignedUrl, {
+  // Remove checksum parameters from URL if present (they're optional for presigned URLs)
+  const url = new URL(presignedUrl);
+  url.searchParams.delete('x-amz-checksum-crc32');
+  url.searchParams.delete('x-amz-sdk-checksum-algorithm');
+  const cleanUrl = url.toString();
+
+  const response = await fetch(cleanUrl, {
     method: 'PUT',
     body: chunk,
-    headers: {
-      'Content-Type': mimetype,
-    },
+    // Don't set Content-Type for multipart upload parts
+    // The Content-Type is set during CreateMultipartUpload
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to upload chunk: ${response.statusText}`);
+    const errorText = await response.text().catch(() => response.statusText);
+    throw new Error(`Failed to upload chunk: ${response.status} ${errorText}`);
   }
 
-  // Extract ETag from response headers
-  const etag = response.headers.get('ETag');
+  // Extract ETag from response headers (remove quotes if present)
+  const etag = response.headers.get('ETag') || response.headers.get('etag');
   if (!etag) {
     throw new Error('ETag not found in response');
   }
 
-  return etag;
+  // Remove quotes from ETag if present
+  return etag.replace(/^"|"$/g, '');
 };
 
 /**
@@ -67,13 +73,12 @@ export const uploadChunk = async (
 export const uploadChunks = async (
   chunks: Blob[],
   presignedUrls: string[],
-  mimetype: string,
   onProgress?: (progress: number) => void
 ): Promise<UploadPart[]> => {
   const parts: UploadPart[] = [];
 
   for (let i = 0; i < chunks.length; i++) {
-    const etag = await uploadChunk(presignedUrls[i], chunks[i], mimetype);
+    const etag = await uploadChunk(presignedUrls[i], chunks[i]);
     parts.push({
       partNumber: i + 1,
       etag: etag,
@@ -88,4 +93,3 @@ export const uploadChunks = async (
 
   return parts;
 };
-
