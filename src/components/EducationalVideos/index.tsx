@@ -156,7 +156,6 @@ const EducationalVideos: React.FC = () => {
         const parts = await uploadChunks(
           chunks,
           presignedUrls,
-          videoFile.type
         );
 
         // Step 3: Complete upload
