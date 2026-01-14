@@ -45,6 +45,8 @@ export interface SessionVideo {
   mimeType: string;
   symptoms: string[];
   status: 'uploaded' | 'draft';
+  thumbnailUrl?: string;
+  videoDuration?: number;
   createdAt: string;
   updatedAt: string;
 }

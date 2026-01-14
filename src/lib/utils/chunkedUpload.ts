@@ -37,28 +37,30 @@ export const splitFileIntoChunks = (file: File): Blob[] => {
  */
 export const uploadChunk = async (
   presignedUrl: string,
-  chunk: Blob,
-  mimetype: string
+  chunk: Blob
 ): Promise<string> => {
+  // Use the presigned URL exactly as provided - don't modify it
+  // The URL is signed and any modification will break the signature
   const response = await fetch(presignedUrl, {
     method: 'PUT',
     body: chunk,
-    headers: {
-      'Content-Type': mimetype,
-    },
+    // Don't set any headers - the presigned URL handles authentication
+    // Content-Type is set during CreateMultipartUpload, not on individual parts
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to upload chunk: ${response.statusText}`);
+    const errorText = await response.text().catch(() => response.statusText);
+    throw new Error(`Failed to upload chunk: ${response.status} ${errorText}`);
   }
 
-  // Extract ETag from response headers
-  const etag = response.headers.get('ETag');
+  // Extract ETag from response headers (remove quotes if present)
+  const etag = response.headers.get('ETag') || response.headers.get('etag');
   if (!etag) {
     throw new Error('ETag not found in response');
   }
 
-  return etag;
+  // Remove quotes from ETag if present
+  return etag.replace(/^"|"$/g, '');
 };
 
 /**
@@ -67,13 +69,12 @@ export const uploadChunk = async (
 export const uploadChunks = async (
   chunks: Blob[],
   presignedUrls: string[],
-  mimetype: string,
   onProgress?: (progress: number) => void
 ): Promise<UploadPart[]> => {
   const parts: UploadPart[] = [];
 
   for (let i = 0; i < chunks.length; i++) {
-    const etag = await uploadChunk(presignedUrls[i], chunks[i], mimetype);
+    const etag = await uploadChunk(presignedUrls[i], chunks[i]);
     parts.push({
       partNumber: i + 1,
       etag: etag,
@@ -88,4 +89,3 @@ export const uploadChunks = async (
 
   return parts;
 };
-
