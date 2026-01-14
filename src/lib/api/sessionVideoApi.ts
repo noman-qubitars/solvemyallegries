@@ -66,6 +66,43 @@ export interface UpdateSessionVideoRequest {
   video?: File;
 }
 
+export interface InitiateUploadRequest {
+  filename: string;
+  mimetype: string;
+  totalSize: number;
+}
+
+export interface InitiateUploadResponse {
+  success: boolean;
+  message: string;
+  data: {
+    uploadId: string;
+    key: string;
+    chunkSize: number;
+    presignedUrls: string[];
+    totalParts: number;
+  };
+}
+
+export interface CompleteUploadRequest {
+  uploadId: string;
+  key: string;
+  parts: Array<{
+    partNumber: number;
+    etag: string;
+  }>;
+  title: string;
+  description?: string;
+  symptoms?: string[];
+  status?: 'uploaded' | 'draft';
+}
+
+export interface CompleteUploadResponse {
+  success: boolean;
+  message: string;
+  data: SessionVideo;
+}
+
 export const sessionVideoApi = createApi({
   reducerPath: 'sessionVideoApi',
   baseQuery: baseQueryWithReauth,
@@ -128,6 +165,21 @@ export const sessionVideoApi = createApi({
       }),
       invalidatesTags: ['SessionVideo'],
     }),
+    initiateUpload: builder.mutation<InitiateUploadResponse, InitiateUploadRequest>({
+      query: (body) => ({
+        url: '/api/v1/session-videos/initiate-upload',
+        method: 'POST',
+        body,
+      }),
+    }),
+    completeUpload: builder.mutation<CompleteUploadResponse, CompleteUploadRequest>({
+      query: (body) => ({
+        url: '/api/v1/session-videos/complete-upload',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['SessionVideo'],
+    }),
   }),
 });
 
@@ -136,5 +188,7 @@ export const {
   useCreateVideoMutation,
   useUpdateVideoMutation,
   useDeleteVideoMutation,
+  useInitiateUploadMutation,
+  useCompleteUploadMutation,
 } = sessionVideoApi;
 

@@ -19,7 +19,7 @@ const Modal: React.FC<ModalProps> = ({
     onClose, 
     editingVideo,
     onSubmit,
-    isLoading = false 
+    isLoading = false
 }) => {
     const MAX_FILE_SIZE = 500 * 1024 * 1024;
 

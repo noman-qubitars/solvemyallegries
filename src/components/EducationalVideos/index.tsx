@@ -13,9 +13,12 @@ import {
   useCreateVideoMutation,
   useUpdateVideoMutation,
   useDeleteVideoMutation,
+  useInitiateUploadMutation,
+  useCompleteUploadMutation,
   EducationalVideo
 } from "@/lib/api/educationalVideoApi";
 import { useToaster } from "@/components/Toaster";
+import { splitFileIntoChunks, uploadChunks } from "@/lib/utils/chunkedUpload";
 
 const EducationalVideos: React.FC = () => {
   const { showToast } = useToaster();
@@ -45,6 +48,8 @@ const EducationalVideos: React.FC = () => {
   const [createVideo, { isLoading: creating }] = useCreateVideoMutation();
   const [updateVideo, { isLoading: updating }] = useUpdateVideoMutation();
   const [deleteVideo] = useDeleteVideoMutation();
+  const [initiateUpload] = useInitiateUploadMutation();
+  const [completeUpload] = useCompleteUploadMutation();
 
   // Get all videos
   const allUploadedVideos = uploadedVideosData?.data || [];
@@ -121,6 +126,7 @@ const EducationalVideos: React.FC = () => {
   const handleSubmit = async (values: { title: string; description: string; videos: File[] }, isDraft: boolean) => {
     try {
       if (editingVideo) {
+        // For editing, use the old method (can be updated later)
         await updateVideo({
           id: editingVideo._id,
           title: values.title,
@@ -129,11 +135,38 @@ const EducationalVideos: React.FC = () => {
           video: values.videos[0],
         }).unwrap();
       } else {
-        await createVideo({
+        // For new videos, use chunked upload
+        const videoFile = values.videos[0];
+        
+        // Step 1: Initiate upload
+        const initiateResponse = await initiateUpload({
+          filename: videoFile.name,
+          mimetype: videoFile.type,
+          totalSize: videoFile.size,
+        }).unwrap();
+
+        if (!initiateResponse.success || !initiateResponse.data) {
+          throw new Error("Failed to initiate upload");
+        }
+
+        const { uploadId, key, presignedUrls } = initiateResponse.data;
+
+        // Step 2: Split file into chunks and upload
+        const chunks = splitFileIntoChunks(videoFile);
+        const parts = await uploadChunks(
+          chunks,
+          presignedUrls,
+          videoFile.type
+        );
+
+        // Step 3: Complete upload
+        await completeUpload({
+          uploadId,
+          key,
+          parts,
           title: values.title,
           description: values.description,
           status: isDraft ? "draft" : "uploaded",
-          video: values.videos[0],
         }).unwrap();
       }
 
@@ -154,7 +187,7 @@ const EducationalVideos: React.FC = () => {
         }
       }, 100);
     } catch (error: any) {
-      const errorMessage = error?.data?.message || `Failed to ${isDraft ? 'save draft' : 'upload video'}`;
+      const errorMessage = error?.data?.message || error?.message || `Failed to ${isDraft ? 'save draft' : 'upload video'}`;
       showToast(errorMessage, "error");
     }
   };

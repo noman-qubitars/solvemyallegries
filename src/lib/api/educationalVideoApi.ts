@@ -74,6 +74,42 @@ export interface UpdateVideoRequest {
   video?: File;
 }
 
+export interface InitiateUploadRequest {
+  filename: string;
+  mimetype: string;
+  totalSize: number;
+}
+
+export interface InitiateUploadResponse {
+  success: boolean;
+  message: string;
+  data: {
+    uploadId: string;
+    key: string;
+    chunkSize: number;
+    presignedUrls: string[];
+    totalParts: number;
+  };
+}
+
+export interface CompleteUploadRequest {
+  uploadId: string;
+  key: string;
+  parts: Array<{
+    partNumber: number;
+    etag: string;
+  }>;
+  title: string;
+  description?: string;
+  status?: 'uploaded' | 'draft';
+}
+
+export interface CompleteUploadResponse {
+  success: boolean;
+  message: string;
+  data: EducationalVideo;
+}
+
 export const educationalVideoApi = createApi({
   reducerPath: 'educationalVideoApi',
   baseQuery: baseQueryWithReauth,
@@ -136,6 +172,21 @@ export const educationalVideoApi = createApi({
       }),
       invalidatesTags: ['EducationalVideo'],
     }),
+    initiateUpload: builder.mutation<InitiateUploadResponse, InitiateUploadRequest>({
+      query: (body) => ({
+        url: '/api/v1/educational-videos/initiate-upload',
+        method: 'POST',
+        body,
+      }),
+    }),
+    completeUpload: builder.mutation<CompleteUploadResponse, CompleteUploadRequest>({
+      query: (body) => ({
+        url: '/api/v1/educational-videos/complete-upload',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['EducationalVideo'],
+    }),
   }),
 });
 
@@ -144,4 +195,6 @@ export const {
   useCreateVideoMutation,
   useUpdateVideoMutation,
   useDeleteVideoMutation,
+  useInitiateUploadMutation,
+  useCompleteUploadMutation,
 } = educationalVideoApi;
