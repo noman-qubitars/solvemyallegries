@@ -155,7 +155,8 @@ const EducationalVideos: React.FC = () => {
         const chunks = splitFileIntoChunks(videoFile);
         const parts = await uploadChunks(
           chunks,
-          presignedUrls
+          presignedUrls,
+          videoFile.type
         );
 
         // Step 3: Complete upload

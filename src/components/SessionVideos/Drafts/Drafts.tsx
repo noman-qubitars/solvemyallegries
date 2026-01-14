@@ -64,22 +64,11 @@ const Drafts: React.FC<DraftsProps> = ({ drafts, onEdit, onDelete, searchTerm, o
                     {filteredDrafts.map((draft, cardIndex) => (
                         <div key={draft._id} className="border border-[#B1A9A9] rounded-lg cursor-pointer flex flex-col" onClick={() => onSelectCard(cardIndex)}>
                             <div className="relative">
-                                {draft.thumbnailUrl ? (
-                                    <Image
-                                        src={draft.thumbnailUrl}
-                                        alt={draft.title}
-                                        width={300}
-                                        height={169}
-                                        className="w-full h-[169px] rounded-tl-lg rounded-tr-lg object-cover"
-                                        unoptimized
-                                    />
-                                ) : (
-                                    <video
-                                        src={draft.videoUrl.startsWith('http') ? draft.videoUrl : `${apiUrl}${draft.videoUrl}`}
-                                        className="w-full h-[169px] rounded-tl-lg rounded-tr-lg object-cover"
-                                        preload="metadata"
-                                    />
-                                )}
+                                <video
+                                    src={`${apiUrl}${draft.videoUrl}`}
+                                    className="w-full h-[169px] rounded-tl-lg rounded-tr-lg object-cover"
+                                    preload="metadata"
+                                />
                                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                     <Image src="/images/Educational/play.svg" alt="play" width={26} height={26} />
                                 </div>
