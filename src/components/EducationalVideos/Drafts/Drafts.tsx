@@ -70,7 +70,7 @@ const Drafts: React.FC<DraftsProps> = ({ drafts, onEdit, onDelete, searchTerm, o
                                 <div className="relative">
                                 {draft.thumbnailUrl ? (
                                     <Image
-                                        src={`${apiUrl}${draft.thumbnailUrl}`}
+                                        src={draft.thumbnailUrl.startsWith('http') ? draft.thumbnailUrl : `${apiUrl}${draft.thumbnailUrl}`}
                                         alt={draft.title}
                                         width={320}
                                         height={169}
@@ -80,7 +80,7 @@ const Drafts: React.FC<DraftsProps> = ({ drafts, onEdit, onDelete, searchTerm, o
                                     />
                                 ) : (
                                     <video
-                                        src={`${apiUrl}${draft.videoUrl}`}
+                                        src={draft.videoUrl.startsWith('http') ? draft.videoUrl : `${apiUrl}${draft.videoUrl}`}
                                         className="w-full h-[169px] rounded-tl-lg rounded-tr-lg object-cover"
                                         preload="metadata"
                                     />

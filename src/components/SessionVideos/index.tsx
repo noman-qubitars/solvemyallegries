@@ -15,6 +15,8 @@ import {
   useDeleteVideoMutation,
   useInitiateUploadMutation,
   useCompleteUploadMutation,
+  useInitiateUpdateUploadMutation,
+  useCompleteUpdateUploadMutation,
   SessionVideo
 } from "@/lib/api/sessionVideoApi";
 import { useToaster } from "@/components/Toaster";
@@ -46,6 +48,8 @@ const SessionVideos: React.FC = () => {
   const [deleteVideo] = useDeleteVideoMutation();
   const [initiateUpload] = useInitiateUploadMutation();
   const [completeUpload] = useCompleteUploadMutation();
+  const [initiateUpdateUpload] = useInitiateUpdateUploadMutation();
+  const [completeUpdateUpload] = useCompleteUpdateUploadMutation();
 
   const uploadedVideos = uploadedVideosData?.data || [];
   const drafts = draftVideosData?.data || [];
@@ -81,15 +85,52 @@ const SessionVideos: React.FC = () => {
   const handleSubmit = async (values: { title: string; description: string; symptoms: string[]; videos: File[] }, isDraft: boolean) => {
     try {
       if (editingVideo) {
-        // For editing, use the old method (can be updated later)
-        await updateVideo({
-          id: editingVideo._id,
-          title: values.title,
-          description: values.description,
-          symptoms: values.symptoms,
-          status: isDraft ? "draft" : "uploaded",
-          video: values.videos[0],
-        }).unwrap();
+        // For editing, use chunked upload if video file is provided
+        if (values.videos.length > 0 && values.videos[0]) {
+          const videoFile = values.videos[0];
+          
+          // Step 1: Initiate update upload
+          const initiateResponse = await initiateUpdateUpload({
+            id: editingVideo._id,
+            filename: videoFile.name,
+            mimetype: videoFile.type,
+            totalSize: videoFile.size,
+          }).unwrap();
+
+          if (!initiateResponse.success || !initiateResponse.data) {
+            throw new Error("Failed to initiate update upload");
+          }
+
+          const { uploadId, key, presignedUrls } = initiateResponse.data;
+
+          // Step 2: Split file into chunks and upload
+          const chunks = splitFileIntoChunks(videoFile);
+          const parts = await uploadChunks(
+            chunks,
+            presignedUrls
+          );
+
+          // Step 3: Complete update upload
+          await completeUpdateUpload({
+            id: editingVideo._id,
+            uploadId,
+            key,
+            parts,
+            title: values.title,
+            description: values.description,
+            symptoms: values.symptoms,
+            status: isDraft ? "draft" : "uploaded",
+          }).unwrap();
+        } else {
+          // No video file, just update metadata
+          await updateVideo({
+            id: editingVideo._id,
+            title: values.title,
+            description: values.description,
+            symptoms: values.symptoms,
+            status: isDraft ? "draft" : "uploaded",
+          }).unwrap();
+        }
       } else {
         // For new videos, use chunked upload
         const videoFile = values.videos[0];
@@ -128,7 +169,7 @@ const SessionVideos: React.FC = () => {
 
       setIsModalOpen(false);
       setEditingVideo(null);
-      showToast(isDraft ? "Draft saved successfully" : "Video uploaded successfully", "success");
+      showToast(editingVideo ? (isDraft ? "Draft updated successfully" : "Video updated successfully") : (isDraft ? "Draft saved successfully" : "Video uploaded successfully"), "success");
 
       setTimeout(() => {
         try {

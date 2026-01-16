@@ -68,10 +68,10 @@ const Upload: React.FC<UploadProps> = ({ videos, onEdit, onDelete, searchTerm, o
                     <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                         {filteredVideos.map((video, cardIndex) => (
                             <div key={video._id} className="border border-[#B1A9A9] rounded-lg cursor-pointer flex flex-col" onClick={() => onSelectCard(cardIndex)}>
-                                <div className="relative">
-                                {video.thumbnailUrl ? (
+                            <div className="relative">
+                            {video.thumbnailUrl ? (
                                     <Image
-                                        src={`${apiUrl}${video.thumbnailUrl}`}
+                                        src={video.thumbnailUrl.startsWith('http') ? video.thumbnailUrl : `${apiUrl}${video.thumbnailUrl}`}
                                         alt={video.title}
                                         width={320}
                                         height={169}
@@ -81,7 +81,7 @@ const Upload: React.FC<UploadProps> = ({ videos, onEdit, onDelete, searchTerm, o
                                     />
                                 ) : (
                                     <video
-                                        src={`${apiUrl}${video.videoUrl}`}
+                                        src={video.videoUrl.startsWith('http') ? video.videoUrl : `${apiUrl}${video.videoUrl}`}
                                         className="w-full h-[169px] rounded-tl-lg rounded-tr-lg object-cover"
                                         preload="metadata"
                                     />

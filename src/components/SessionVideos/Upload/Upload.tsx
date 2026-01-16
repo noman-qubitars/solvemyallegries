@@ -61,7 +61,7 @@ const Upload: React.FC<UploadProps> = ({ videos, onEdit, onDelete, searchTerm, o
             {filteredVideos.length === 0 ? (
                 <p className="text-[#11401C] font-semibold text-center">No Upload Video Available.</p>
             ) : (
-                <div className="grid grid-cols-5 gap-4">
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     {filteredVideos.map((video, cardIndex) => (
                         <div key={video._id} className="border border-[#B1A9A9] rounded-lg cursor-pointer flex flex-col" onClick={() => onSelectCard(cardIndex)}>
                             <div className="relative">

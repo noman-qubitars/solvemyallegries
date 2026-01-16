@@ -187,6 +187,21 @@ export const educationalVideoApi = createApi({
       }),
       invalidatesTags: ['EducationalVideo'],
     }),
+    initiateUpdateUpload: builder.mutation<InitiateUploadResponse, { id: string; filename: string; mimetype: string; totalSize: number }>({
+      query: ({ id, ...body }) => ({
+        url: `/api/v1/educational-videos/${id}/initiate-update-upload`,
+        method: 'POST',
+        body,
+      }),
+    }),
+    completeUpdateUpload: builder.mutation<{ success: boolean; message: string; data: EducationalVideo }, { id: string; uploadId: string; key: string; parts: Array<{ partNumber: number; etag: string }>; title?: string; description?: string; status?: 'uploaded' | 'draft' }>({
+      query: ({ id, ...body }) => ({
+        url: `/api/v1/educational-videos/${id}/complete-update-upload`,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['EducationalVideo'],
+    }),
   }),
 });
 
@@ -197,4 +212,6 @@ export const {
   useDeleteVideoMutation,
   useInitiateUploadMutation,
   useCompleteUploadMutation,
+  useInitiateUpdateUploadMutation,
+  useCompleteUpdateUploadMutation,
 } = educationalVideoApi;

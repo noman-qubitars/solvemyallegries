@@ -72,9 +72,9 @@ const Drawer: React.FC<DrawerProps> = ({ open, onClose, menus }) => {
           <button
             aria-label="Close drawer"
             onClick={onClose}
-            className="hover:bg-gray-100 transition-colors"
+            className="cursor-pointer"
           >
-            <IoClose size={24} className="text-[#666666]" />
+            <IoClose size={24} className="text-[#666666] hover:text-black transition-colors" />
           </button>
         </div>
 
@@ -103,7 +103,7 @@ const Drawer: React.FC<DrawerProps> = ({ open, onClose, menus }) => {
                       <Link
                         href={item.link || ""}
                         onClick={handleLinkClick}
-                        className={`flex items-center gap-3 p-2 text-[14px] capitalize rounded-md ${(item.link !== "/" && location.startsWith(item.link || "")) ? "bg-[#11401C] font-semibold w-[12rem] text-white pl-3 rounded-md" : "hover:text-black text-[#666666] font-medium w-fit"
+                        className={`flex items-center gap-3 p-2 text-[14px] capitalize rounded-md ${(item.link !== "/" && location.startsWith(item.link || "")) ? "bg-[#11401C] font-semibold w-48 text-white pl-3 rounded-md" : "hover:text-black text-[#666666] font-medium w-fit"
                           } transition-colors duration-300`}
                       >
                         {item.icon && (

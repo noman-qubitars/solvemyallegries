@@ -60,7 +60,7 @@ const Drafts: React.FC<DraftsProps> = ({ drafts, onEdit, onDelete, searchTerm, o
             {filteredDrafts.length === 0 ? (
                 <p className="text-[#11401C] font-semibold text-center">No Drafts Video Available.</p>
             ) : (
-                <div className="grid grid-cols-5 gap-4">
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     {filteredDrafts.map((draft, cardIndex) => (
                         <div key={draft._id} className="border border-[#B1A9A9] rounded-lg cursor-pointer flex flex-col" onClick={() => onSelectCard(cardIndex)}>
                             <div className="relative">

@@ -182,6 +182,21 @@ export const sessionVideoApi = createApi({
       }),
       invalidatesTags: ['SessionVideo'],
     }),
+    initiateUpdateUpload: builder.mutation<InitiateUploadResponse, { id: string; filename: string; mimetype: string; totalSize: number }>({
+      query: ({ id, ...body }) => ({
+        url: `/api/v1/session-videos/${id}/initiate-update-upload`,
+        method: 'POST',
+        body,
+      }),
+    }),
+    completeUpdateUpload: builder.mutation<{ success: boolean; message: string; data: SessionVideo }, { id: string; uploadId: string; key: string; parts: Array<{ partNumber: number; etag: string }>; title?: string; description?: string; symptoms?: string[]; status?: 'uploaded' | 'draft' }>({
+      query: ({ id, ...body }) => ({
+        url: `/api/v1/session-videos/${id}/complete-update-upload`,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['SessionVideo'],
+    }),
   }),
 });
 
@@ -192,5 +207,7 @@ export const {
   useDeleteVideoMutation,
   useInitiateUploadMutation,
   useCompleteUploadMutation,
+  useInitiateUpdateUploadMutation,
+  useCompleteUpdateUploadMutation,
 } = sessionVideoApi;
 

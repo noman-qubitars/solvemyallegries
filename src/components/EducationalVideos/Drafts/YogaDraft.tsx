@@ -74,7 +74,7 @@ const YogaDraft: React.FC<YogaDraftProps> = ({ videos, index, goBack, onEdit, on
             <button onClick={goBack} className="flex items-center gap-2 cursor-pointer"><MdKeyboardArrowLeft />Back</button>
             <div className="flex gap-2 mt-4">
                 <div className="w-[80%]">
-                    <video controls src={`${apiUrl}${currentVideo.videoUrl}`} className="w-full h-[500px] object-contain bg-black" />
+                    <video controls src={currentVideo.videoUrl.startsWith('http') ? currentVideo.videoUrl : `${apiUrl}${currentVideo.videoUrl}`} className="w-full h-[500px] object-contain bg-black" />
                     <div className="flex items-center justify-between mt-4">
                         <h2 className="text-[32px] font-medium text-[#11401C]">{currentVideo.title}</h2>
                         <div className="flex items-center gap-2">

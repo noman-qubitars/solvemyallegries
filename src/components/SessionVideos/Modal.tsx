@@ -76,7 +76,7 @@ const Modal: React.FC<ModalProps> = ({
                         }
                     }}
                 >
-                    {({ values, setFieldValue, errors, touched, setErrors, setFieldTouched, isSubmitting }) => {
+                    {({ values, setFieldValue, errors, touched, setErrors, setFieldTouched, isSubmitting, validateForm, setSubmitting }) => {
                         const [newSymptom, setNewSymptom] = useState("");
                         const [isSymptomFocused, setIsSymptomFocused] = useState(false);
 
@@ -231,7 +231,9 @@ const Modal: React.FC<ModalProps> = ({
                                                                                             <video
                                                                                                 controls
                                                                                                 src={URL.createObjectURL(file)}
-                                                                                                className="w-full h-[100px] rounded-lg"
+                                                                                                className="w-full h-[100px] rounded-lg object-cover"
+                                                                                                preload="metadata"
+                                                                                                playsInline
                                                                                             />
                                                                                             <button
                                                                                                 type="button"
@@ -239,7 +241,7 @@ const Modal: React.FC<ModalProps> = ({
                                                                                                     const newVideos = values.videos.filter((_, i) => i !== index);
                                                                                                     setFieldValue("videos", newVideos);
                                                                                                 }}
-                                                                                                className="absolute top-1 right-1 border border-[#CCCCCC] cursor-pointer rounded-md p-1 shadow-lg"
+                                                                                                className="absolute top-1 right-1 border border-[#CCCCCC] cursor-pointer rounded-md p-1 shadow-lg bg-white"
                                                                                             >
                                                                                                 <MdDeleteOutline className="text-red-500 text-md" />
                                                                                             </button>
@@ -254,7 +256,7 @@ const Modal: React.FC<ModalProps> = ({
                                                                                 <div className="mt-4">
                                                                                     <video
                                                                                         controls
-                                                                                        src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${editingVideo.videoUrl}`}
+                                                                                        src={editingVideo.videoUrl.startsWith('http') ? editingVideo.videoUrl : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}${editingVideo.videoUrl}`}
                                                                                         className="w-full h-[200px] rounded-lg"
                                                                                     />
                                                                                     <p className="text-xs text-gray-500 mt-2 text-center">Current video (upload new file to replace)</p>
@@ -302,15 +304,43 @@ const Modal: React.FC<ModalProps> = ({
                                             e.preventDefault();
                                             if (isSubmitting || isLoading) return;
                                             
-                                            if (values.videos.length > 0) {
-                                                const file = values.videos[0];
-                                                if (file.size > MAX_FILE_SIZE) {
-                                                    setErrors({ videos: "Video file size must be less than 500MB" });
+                                            setSubmitting(true);
+                                            try {
+                                                // Validate form first
+                                                const validationErrors = await validateForm();
+                                                
+                                                // Set touched for all fields to show errors
+                                                setFieldTouched("title", true);
+                                                setFieldTouched("description", true);
+                                                setFieldTouched("videos", true);
+                                                
+                                                // Check file size
+                                                if (values.videos.length > 0) {
+                                                    const file = values.videos[0];
+                                                    if (file.size > MAX_FILE_SIZE) {
+                                                        setErrors({ videos: "Video file size must be less than 500MB" });
+                                                        setFieldTouched("videos", true);
+                                                        return;
+                                                    }
+                                                }
+                                                
+                                                // Check if there are validation errors
+                                                if (Object.keys(validationErrors).length > 0) {
+                                                    // Errors will be displayed because we set touched
                                                     return;
                                                 }
+                                                
+                                                // Check if video is required for new videos
+                                                if (!editingVideo && values.videos.length === 0) {
+                                                    setErrors({ videos: "At least one video file is required" });
+                                                    setFieldTouched("videos", true);
+                                                    return;
+                                                }
+                                                
+                                                await handleFormSubmit(values, true, setErrors);
+                                            } finally {
+                                                setSubmitting(false);
                                             }
-                                            
-                                            await handleFormSubmit(values, true, setErrors);
                                         }}
                                         disabled={isLoading || isSubmitting}
                                         className="rounded-full px-[24px] py-[8px] bg-transparent border border-[#859B5B] text-[#859B5B] text-center cursor-pointer font-bold disabled:opacity-50 disabled:cursor-not-allowed"
