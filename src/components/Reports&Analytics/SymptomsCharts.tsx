@@ -1,3 +1,5 @@
+"use client"
+
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 
@@ -63,13 +65,13 @@ const options: Highcharts.Options = {
       name: "High",
       type: "column",
       data: [4, 3, 2, 3, 3, 3, 3, 3, 3, 3],
-      color: "#DCE6FF" 
+      color: "#DCE6FF"
     },
     {
       name: "Medium",
       type: "column",
       data: [3, 5, 4, 3, 6, 6, 6, 6, 6, 3],
-      color: "#8FA6FF" 
+      color: "#8FA6FF"
     },
     {
       name: "Low",

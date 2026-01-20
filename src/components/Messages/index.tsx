@@ -7,6 +7,7 @@ import ChatHeader from "./ChatHeader";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
 import DeleteChatModal from "./DeleteChatModal";
+import DeleteMessageModal from "./DeleteMessageModal";
 import ContextMenu from "./ContextMenu";
 import { useGetAllMessagesQuery, useGetUserMessagesQuery, useSendMessageMutation, useMarkAsReadMutation, useDeleteMessageMutation, useDeleteAllMessagesMutation } from '@/lib/api/messageApi';
 import { useGetUsersQuery } from '@/lib/api/userApi';
@@ -29,6 +30,8 @@ const Messages: React.FC = () => {
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; messageId: string } | null>(null);
   const [showDeleteChatMenu, setShowDeleteChatMenu] = useState(false);
   const [showDeleteChatModal, setShowDeleteChatModal] = useState(false);
+  const [showDeleteMessageModal, setShowDeleteMessageModal] = useState(false);
+  const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
@@ -427,16 +430,27 @@ const Messages: React.FC = () => {
     });
   };
 
-  const handleDeleteMessage = async (messageId: string) => {
+  const handleDeleteMessage = (messageId: string) => {
+    setMessageToDelete(messageId);
+    setShowDeleteMessageModal(true);
+    setContextMenu(null);
+  };
+
+  const confirmDeleteMessage = async () => {
+    if (!messageToDelete) return;
+    
     try {
-      await deleteMessage(messageId).unwrap();
-      setRealTimeMessages(prev => prev.filter(m => m._id !== messageId));
+      await deleteMessage(messageToDelete).unwrap();
+      setRealTimeMessages(prev => prev.filter(m => m._id !== messageToDelete));
       refetchAllMessages();
       refetchUserMessages();
       showToast("Message deleted successfully", "success");
-      setContextMenu(null);
+      setShowDeleteMessageModal(false);
+      setMessageToDelete(null);
     } catch (error: any) {
       showToast(error?.data?.message || "Failed to delete message", "error");
+      setShowDeleteMessageModal(false);
+      setMessageToDelete(null);
     }
   };
 
@@ -558,6 +572,14 @@ const Messages: React.FC = () => {
                 contextMenuRef={contextMenuRef}
               />
             )}
+            <DeleteMessageModal
+              isOpen={showDeleteMessageModal}
+              onClose={() => {
+                setShowDeleteMessageModal(false);
+                setMessageToDelete(null);
+              }}
+              onConfirm={confirmDeleteMessage}
+            />
             {replyingTo && (
               <div className="flex justify-end items-end px-6 pb-2">
                 <div className="max-w-[60%] px-4 py-2 rounded-lg bg-gray-200 rounded-br-none text-sm">

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Message } from '@/lib/api/messageApi';
+import { HiOutlineDotsVertical } from 'react-icons/hi';
 
 interface User {
   id?: string;
@@ -29,10 +30,22 @@ const MessageItem: React.FC<MessageItemProps> = ({
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
   const userImage = selectedUser?.image || null;
 
+  const getFileUrl = (fileUrl?: string): string => {
+    if (!fileUrl) return '';
+    if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
+      return fileUrl;
+    }
+    return `${apiBaseUrl}${fileUrl}`;
+  };
+
+  const handleMenuClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onContextMenu(e, msg);
+  };
+
   return (
     <div
       className={`flex ${msg.sentBy === "user" ? "justify-start" : "justify-end"} items-end`}
-      onContextMenu={msg.sentBy === "admin" ? (e) => onContextMenu(e, msg) : undefined}
     >
       {msg.sentBy === "user" && (
         <div className="relative w-[25px] h-[25px] rounded-full overflow-hidden shrink-0 bg-[#11401C] mr-2">
@@ -66,7 +79,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
           msg.content
         ) : msg.messageType === 'voice' && msg.fileUrl ? (
           <audio controls className="max-w-full">
-            <source src={`${apiBaseUrl}${msg.fileUrl}`} />
+            <source src={getFileUrl(msg.fileUrl)} type="audio/webm" />
           </audio>
         ) : msg.fileUrl ? (
           <div>
@@ -78,12 +91,12 @@ const MessageItem: React.FC<MessageItemProps> = ({
                   </div>
                 ) : (
                   <img
-                    src={`${apiBaseUrl}${msg.fileUrl}`}
+                    src={getFileUrl(msg.fileUrl)}
                     alt={msg.fileName || 'Image'}
                     className="max-w-full max-h-[300px] rounded-lg object-contain cursor-pointer hover:opacity-90 transition-opacity"
                     onError={() => setImageError(true)}
                     onClick={() => {
-                      window.open(`${apiBaseUrl}${msg.fileUrl}`, '_blank');
+                      window.open(getFileUrl(msg.fileUrl), '_blank');
                     }}
                   />
                 )}
@@ -94,12 +107,12 @@ const MessageItem: React.FC<MessageItemProps> = ({
             ) : msg.messageType === 'pdf' ? (
               <div className="flex items-center gap-2">
                 <span>📄</span>
-                <a href={`${apiBaseUrl}${msg.fileUrl}`} download className="text-blue-600 underline">
+                <a href={getFileUrl(msg.fileUrl)} download className="text-blue-600 underline">
                   {msg.fileName || 'Download PDF'}
                 </a>
               </div>
             ) : (
-              <a href={`${apiBaseUrl}${msg.fileUrl}`} download className="text-blue-600 underline">
+              <a href={getFileUrl(msg.fileUrl)} download className="text-blue-600 underline">
                 {msg.fileName || 'Download file'}
               </a>
             )}
@@ -107,7 +120,26 @@ const MessageItem: React.FC<MessageItemProps> = ({
         ) : (
           msg.content || 'File'
         )}
-        <div className="text-[10px] text-right text-gray-500 mt-1">{formatTime(msg.createdAt)}</div>
+        <div className="flex items-center justify-between mt-1">
+          {msg.sentBy === "admin" ? (
+            <>
+              <button
+                onClick={handleMenuClick}
+                className="text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+                aria-label="Message options"
+              >
+                <HiOutlineDotsVertical className="w-4 h-4" />
+              </button>
+              <div className="text-[10px] text-gray-500">
+                {formatTime(msg.createdAt)}
+              </div>
+            </>
+          ) : (
+            <div className="text-[10px] text-right text-gray-500 ml-auto">
+              {formatTime(msg.createdAt)}
+            </div>
+          )}
+        </div>
       </div>
       {msg.sentBy === "admin" && (
         <div className="w-[32px] h-[32px] rounded-full flex items-center justify-center ml-2 overflow-hidden">
