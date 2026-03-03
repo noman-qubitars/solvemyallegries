@@ -251,7 +251,7 @@ const SessionVideos: React.FC = () => {
               key={index}
               onClick={() => setActiveIndex(index)}
               className={`flex items-center gap-1 cursor-pointer border-b-2
-                        ${activeIndex === index ? "font-semibold text-[#11401C] border-[#11401C] pb-1" : "font-medium text-[#717171] border-transparent pb-1"}`}
+                        ${activeIndex === index ? "font-semibold text-[#11401C] border-[#11401C] pb-1" : "font-medium text-gray-50 border-transparent pb-1"}`}
             >
               {item.label}
               {item.number}

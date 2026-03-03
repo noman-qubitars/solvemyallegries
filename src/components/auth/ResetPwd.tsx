@@ -6,17 +6,11 @@ import { MdOutlineLock } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { adminForgotPasswordSchema } from "@/lib/validation/adminAuthSchema";
-import axios from "axios";
+import { useForgotPasswordMutation } from "@/lib/api/authApi";
 import { useToaster } from "@/components/Toaster";
 
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
 const ResetPwd = () => {
+  const [forgotPassword, { isLoading: isSending }] = useForgotPasswordMutation();
   const router = useRouter();
   const { showToast } = useToaster();
 
@@ -26,21 +20,21 @@ const ResetPwd = () => {
 
   const handleSubmit = async (values: typeof initialValues, { setSubmitting }: any) => {
     try {
-      const response = await api.post('/api/v1/auth/forgot-password', {
+      const response = await forgotPassword({
         email: values.email,
-      });
+      }).unwrap();
 
-      if (response.data.success) {
+      if (response.success) {
         showToast("OTP sent to your email successfully!", "success");
         sessionStorage.setItem('resetEmail', values.email);
         setTimeout(() => {
           router.push("/otpscreen");
         }, 500);
       } else {
-        throw new Error(response.data.message || 'Failed to send OTP');
+        throw new Error(response.message || 'Failed to send OTP');
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to send OTP. Please try again.';
+      const errorMessage = error.data?.message || error.message || 'Failed to send OTP. Please try again.';
       showToast(errorMessage, "error");
       setSubmitting(false);
     }
@@ -83,10 +77,10 @@ const ResetPwd = () => {
               </div>
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isSending}
                 className="w-[355px] lg:w-[400px] cursor-pointer mx-auto flex justify-center items-center bg-green-900 text-white py-2 rounded-full hover:bg-green-900 transition duration-200 gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Sending...' : 'Reset Password'} <span> <MdOutlineLock /></span>
+                {isSubmitting || isSending ? 'Sending...' : 'Reset Password'} <span> <MdOutlineLock /></span>
               </button>
             </Form>
           )}

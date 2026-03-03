@@ -9,14 +9,7 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { subscriptionSchema } from "@/lib/validation/subscriptionSchema";
-import axios from "axios";
-
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+import { useCreateCheckoutMutation } from "@/lib/api/subscriptionApi";
 
 interface SubscriptionProps {
     paymentSuccess?: boolean;
@@ -24,6 +17,7 @@ interface SubscriptionProps {
 
 const Subscription: React.FC<SubscriptionProps> = ({ paymentSuccess = false }) => {
     const [isModalOpen, setIsModalOpen] = useState(paymentSuccess);
+    const [createCheckout, { isLoading: isCreating }] = useCreateCheckoutMutation();
 
     useEffect(() => {
         if (paymentSuccess) {
@@ -44,23 +38,24 @@ const Subscription: React.FC<SubscriptionProps> = ({ paymentSuccess = false }) =
 
     const handleSubmit = async (values: typeof initialValues, { setSubmitting, setFieldError, resetForm }: any) => {
         try {
-            const response = await api.post('api/v1/subscription/create-checkout', {
+            const response = await createCheckout({
                 email: values.email,
                 firstName: values.firstName,
                 lastName: values.lastName,
-                phone: values.phone,
-            });
+            }).unwrap();
 
-            if (!response.data.success || !response.data.url) {
-                throw new Error(response.data.message || 'Failed to create checkout session');
+            if (!response.success || !response.url) {
+                throw new Error(response.message || 'Failed to create checkout session');
             }
 
             resetForm();
             setTimeout(() => {
-                window.location.href = response.data.url;
+                if (response.url) {
+                    window.location.href = response.url;
+                }
             }, 500);
         } catch (error: any) {
-            const errorMessage = error.response?.data?.message || error.message || 'Payment processing failed. Please try again.';
+            const errorMessage = error.data?.message || error.message || 'Payment processing failed. Please try again.';
             setFieldError('email', errorMessage);
             setSubmitting(false);
         }
@@ -163,10 +158,10 @@ const Subscription: React.FC<SubscriptionProps> = ({ paymentSuccess = false }) =
                                     </button>
                                     <button
                                         type="submit"
-                                        disabled={isSubmitting}
+                                        disabled={isSubmitting || isCreating}
                                         className="bg-green cursor-pointer text-white rounded-lg h-[40px] sm:h-[46px] md:h-[40x] lg:h-[52px] xl:h-[56px] text-center font-extrabold font-poppins w-full disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        {isSubmitting ? 'Getting App' : 'Get App'}
+                                        {isSubmitting || isCreating ? 'Getting App' : 'Get App'}
                                     </button>
                                 </div>
                                 <p className="font-poppins font-normal text-gray-150 mt-[24px]">

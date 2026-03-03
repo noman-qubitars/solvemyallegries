@@ -9,22 +9,23 @@ import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { adminResetPasswordSchema } from "@/lib/validation/adminAuthSchema";
-import axios from "axios";
+import { useResetPasswordMutation } from "@/lib/api/authApi";
 import { useToaster } from "@/components/Toaster";
 
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
 const NewPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [resetPassword, { isLoading: isResetting }] = useResetPasswordMutation();
+
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const { showToast } = useToaster();
+
+  const initialValues = {
+    password: "",
+    confirmPassword: "",
+  };
 
   useEffect(() => {
     const storedEmail = typeof window !== 'undefined' ? sessionStorage.getItem('resetEmail') || '' : '';
@@ -35,29 +36,24 @@ const NewPassword = () => {
     setEmail(storedEmail);
   }, [router]);
 
-  const initialValues = {
-    password: "",
-    confirmPassword: "",
-  };
-
   const handleResetPassword = async (values: typeof initialValues, { setSubmitting }: any) => {
     try {
-      const response = await api.post('/api/v1/auth/reset-password', {
+      const response = await resetPassword({
         email: email,
         password: values.password,
-      });
+      }).unwrap();
 
-      if (response.data.success) {
+      if (response.success) {
         showToast("Password reset successfully!", "success");
         sessionStorage.removeItem('resetEmail');
         setTimeout(() => {
           router.push("/signin");
         }, 500);
       } else {
-        throw new Error(response.data.message || 'Password reset failed');
+        throw new Error(response.message || 'Password reset failed');
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'Password reset failed. Please try again.';
+      const errorMessage = error.data?.message || error.message || 'Password reset failed. Please try again.';
       showToast(errorMessage, "error");
       setSubmitting(false);
     }
@@ -132,10 +128,10 @@ const NewPassword = () => {
               </div>
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isResetting}
                 className="w-[355px] lg:w-[400px] mx-auto cursor-pointer bg-green-900 text-white py-2 rounded-full hover:bg-green-900 transition duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Resetting...' : 'Reset Password'} <span> <MdOutlineLock /></span>
+                {isSubmitting || isResetting ? 'Resetting...' : 'Reset Password'} <span> <MdOutlineLock /></span>
               </button>
               <Link href="/">
                 <div className="flex items-center text-sm font-bold text-green-900 justify-center mt-6">

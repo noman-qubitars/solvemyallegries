@@ -5,22 +5,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { FaLessThan } from "react-icons/fa6";
 import { TiTick } from "react-icons/ti";
-import axios from "axios";
+import { useVerifyOtpMutation, useResendOtpMutation } from "@/lib/api/authApi";
 import { useToaster } from "@/components/Toaster";
-
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
 const OtpScreen = () => {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   const [secondsLeft, setSecondsLeft] = useState(120);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [isResending, setIsResending] = useState(false);
+  const [verifyOtp, { isLoading: isVerifyingOtp }] = useVerifyOtpMutation();
+  const [resendOtp, { isLoading: isResendingOtp }] = useResendOtpMutation();
   const router = useRouter();
   const { showToast } = useToaster();
 
@@ -104,13 +97,12 @@ const OtpScreen = () => {
     }
 
     try {
-      setIsVerifying(true);
-      const response = await api.post('/api/v1/auth/otp', {
+      const response = await verifyOtp({
         email: email,
         code: otpCode,
-      });
+      }).unwrap();
 
-      if (response.data.success) {
+      if (response.success) {
         // Show success toast
         showToast("OTP verified successfully!", "success");
         // Store email in sessionStorage for reset password page
@@ -120,10 +112,10 @@ const OtpScreen = () => {
           router.push("/newpassword");
         }, 500);
       } else {
-        throw new Error(response.data.message || 'OTP verification failed');
+        throw new Error(response.message || 'OTP verification failed');
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'Invalid OTP code. Please try again.';
+      const errorMessage = error.data?.message || error.message || 'Invalid OTP code. Please try again.';
       // Show error toast
       showToast(errorMessage, "error");
       // Clear OTP on error
@@ -132,8 +124,6 @@ const OtpScreen = () => {
         if (ref) ref.value = '';
       });
       inputRefs.current[0]?.focus();
-    } finally {
-      setIsVerifying(false);
     }
   };
 
@@ -146,17 +136,16 @@ const OtpScreen = () => {
     }
 
     // Prevent multiple simultaneous requests
-    if (isResending) {
+    if (isResendingOtp) {
       return;
     }
 
     try {
-      setIsResending(true);
-      const response = await api.post('/api/v1/auth/resend-otp', {
+      const response = await resendOtp({
         email: email,
-      });
+      }).unwrap();
 
-      if (response.data.success) {
+      if (response.success) {
         // Show success toast
         showToast("OTP resent to your email successfully!", "success");
         setSecondsLeft(120);
@@ -166,14 +155,12 @@ const OtpScreen = () => {
         });
         inputRefs.current[0]?.focus();
       } else {
-        throw new Error(response.data.message || 'Failed to resend OTP');
+        throw new Error(response.message || 'Failed to resend OTP');
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to resend OTP. Please try again.';
+      const errorMessage = error.data?.message || error.message || 'Failed to resend OTP. Please try again.';
       // Show error toast
       showToast(errorMessage, "error");
-    } finally {
-      setIsResending(false);
     }
   };
 
@@ -219,10 +206,10 @@ const OtpScreen = () => {
 
         <button
           onClick={handleVerifyOtp}
-          disabled={isVerifying || otp.join('').length !== 4}
+          disabled={isVerifyingOtp || otp.join('').length !== 4}
           className="w-[355px] lg:w-[400px] mx-auto bg-green-900 text-white py-2 rounded-full hover:bg-green-900 transition duration-200 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isVerifying ? 'Verifying...' : 'Reset Password'} <span> <TiTick size={25} /></span>
+          {isVerifyingOtp ? 'Verifying...' : 'Reset Password'} <span> <TiTick size={25} /></span>
         </button>
 
         {/* Resend OTP */}
@@ -236,9 +223,9 @@ const OtpScreen = () => {
           ) : (
             <span
               onClick={handleResendOTP}
-              className={`text-green-800 font-semibold cursor-pointer hover:underline ${isResending ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`text-green-800 font-semibold cursor-pointer hover:underline ${isResendingOtp ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              {isResending ? 'Resending...' : 'Resend OTP'}
+              {isResendingOtp ? 'Resending...' : 'Resend OTP'}
             </span>
           )}
         </p>

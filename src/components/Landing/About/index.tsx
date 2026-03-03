@@ -88,7 +88,7 @@ const About: React.FC = () => {
       </div>
 
       {/* How Does This App Work Section */}
-      <div className="max-w-[85rem] mb-[82px] mx-auto mt-4 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-340 mb-[82px] mx-auto mt-4 px-4 sm:px-6 lg:px-8">
         <p className="text-green font-poppins font-bold text-[26px] sm:text-[36px] md:text-[40px] lg:text-[44px] text-center sm:text-left px-2 sm:px-0">
           How does This App Work?
         </p>

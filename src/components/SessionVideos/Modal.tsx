@@ -24,7 +24,7 @@ const Modal: React.FC<ModalProps> = ({
     onSubmit,
     isLoading = false
 }) => {
-    const MAX_FILE_SIZE = 500 * 1024 * 1024;
+    const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // 2GB
 
     if (!isOpen) return null;
 
@@ -40,7 +40,7 @@ const Modal: React.FC<ModalProps> = ({
             const file = values.videos[0];
             if (file.size > MAX_FILE_SIZE) {
                 if (setErrors) {
-                    setErrors({ videos: "Video file size must be less than 500MB" });
+                    setErrors({ videos: "Video file size must be less than 2GB" });
                 }
                 return;
             }
@@ -105,7 +105,7 @@ const Modal: React.FC<ModalProps> = ({
                                                                         name="description"
                                                                         placeholder={field.placeholder}
                                                                         rows={3}
-                                                                        className={`border border-[#8E8E8E] rounded-2xl py-2 focus-within:ring-1 focus-within:ring-[#11401C] focus-within:border-[#11401C] transition-all px-3 w-full placeholder:text-[#B1A9A9] outline-none text-[#222222] ${
+                                                                        className={`border border-[#8E8E8E] rounded-2xl py-2 focus-within:ring-1 focus-within:ring-[#11401C] focus-within:border-[#11401C] transition-all px-3 w-full placeholder:text-[#B1A9A9] outline-none text-black-100 ${
                                                                             errors.description && touched.description ? 'border-red-500' : ''
                                                                         }`}
                                                                     />
@@ -150,7 +150,7 @@ const Modal: React.FC<ModalProps> = ({
                                                                         onFocus={() => setIsSymptomFocused(true)}
                                                                         onBlur={() => setIsSymptomFocused(false)}
                                                                         rows={3}
-                                                                        className="border border-[#8E8E8E] rounded-2xl py-2 focus-within:ring-1 focus-within:ring-[#11401C] focus-within:border-[#11401C] transition-all px-3 w-full placeholder:text-[#B1A9A9] outline-none text-[#222222]"
+                                                                        className="border border-[#8E8E8E] rounded-2xl py-2 focus-within:ring-1 focus-within:ring-[#11401C] focus-within:border-[#11401C] transition-all px-3 w-full placeholder:text-[#B1A9A9] outline-none text-black-100"
                                                                     />
                                                                     {isSymptomFocused && <p className="text-[12px] text-[#333333]">After typing, press Enter.</p>}
                                                                 </div>
@@ -168,7 +168,7 @@ const Modal: React.FC<ModalProps> = ({
                                                                                     if (file) {
                                                                                         if (file.size > MAX_FILE_SIZE) {
                                                                                             setFieldValue("videos", []);
-                                                                                            setErrors({ videos: "Video file size must be less than 500MB" });
+                                                                                            setErrors({ videos: "Video file size must be less than 2GB" });
                                                                                             return;
                                                                                         }
                                                                                         setFieldValue("videos", [file], true);
@@ -189,7 +189,7 @@ const Modal: React.FC<ModalProps> = ({
                                                                                         if (file) {
                                                                                             if (file.size > MAX_FILE_SIZE) {
                                                                                                 setFieldValue("videos", []);
-                                                                                                setErrors({ videos: "Video file size must be less than 500MB" });
+                                                                                                setErrors({ videos: "Video file size must be less than 2GB" });
                                                                                                 e.target.value = '';
                                                                                                 return;
                                                                                             }
@@ -210,7 +210,7 @@ const Modal: React.FC<ModalProps> = ({
                                                                                 <p className="text-[#6D6D6D] font-semibold underline">upload Video</p>
                                                                                 <div className="flex items-center justify-center gap-1 mt-1 text-[#6D6D6D]">
                                                                                     <p className="font-bold text-[12px]">MP4</p>
-                                                                                    <p className="font-normal text-[14px]">(Max size 500MBs, Max Length 6 minutes)</p>
+                                                                                    <p className="font-normal text-[14px]">(Max size 2GB, Max Length 6 minutes)</p>
                                                                                 </div>
                                                                                 <button 
                                                                                     type="button"
@@ -219,7 +219,7 @@ const Modal: React.FC<ModalProps> = ({
                                                                                         e.stopPropagation();
                                                                                         document.getElementById('video-upload')?.click();
                                                                                     }}
-                                                                                    className="mt-[20px] px-[32px] py-[8px] text-white font-bold text-[14px] text-center bg-gradient-to-r cursor-pointer from-[#11401C] via-[#1F7332] to-[#859B5B] rounded-full"
+                                                                                    className="mt-[20px] px-[32px] py-[8px] text-white font-bold text-[14px] text-center bg-linear-to-r cursor-pointer from-[#11401C] via-[#1F7332] to-[#859B5B] rounded-full"
                                                                                 >
                                                                                     Upload File
                                                                                 </button>
@@ -276,7 +276,7 @@ const Modal: React.FC<ModalProps> = ({
                                                                         name="title"
                                                                         type="text"
                                                                         placeholder={field.placeholder}
-                                                                        className={`border border-[#8E8E8E] rounded-full focus-within:ring-1 focus-within:ring-[#11401C] focus-within:border-[#11401C] transition-all px-3 h-[40px] w-full flex items-center gap-2 outline-none text-[#222222] placeholder:text-[#B1A9A9] ${
+                                                                        className={`border border-[#8E8E8E] rounded-full focus-within:ring-1 focus-within:ring-[#11401C] focus-within:border-[#11401C] transition-all px-3 h-[40px] w-full flex items-center gap-2 outline-none text-black-100 placeholder:text-[#B1A9A9] ${
                                                                             errors.title && touched.title ? 'border-red-500' : ''
                                                                         }`}
                                                                     />
@@ -318,7 +318,7 @@ const Modal: React.FC<ModalProps> = ({
                                                 if (values.videos.length > 0) {
                                                     const file = values.videos[0];
                                                     if (file.size > MAX_FILE_SIZE) {
-                                                        setErrors({ videos: "Video file size must be less than 500MB" });
+                                                        setErrors({ videos: "Video file size must be less than 2GB" });
                                                         setFieldTouched("videos", true);
                                                         return;
                                                     }

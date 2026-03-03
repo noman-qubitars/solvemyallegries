@@ -10,15 +10,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { adminSigninSchema } from "@/lib/validation/adminAuthSchema";
-import axios from "axios";
+import { useSignInMutation } from "@/lib/api/authApi";
 import { useToaster } from "@/components/Toaster";
-
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,25 +23,27 @@ const SignIn = () => {
     password: "",
   };
 
+  const [signIn, { isLoading: isSigningIn }] = useSignInMutation();
+
   const handleSignIn = async (values: typeof initialValues, { setSubmitting, setErrors, setTouched }: any) => {
     try {
-      const response = await api.post('/api/v1/auth/signin', {
+      const response = await signIn({
         email: values.email,
         password: values.password,
-      });
+      }).unwrap();
 
-      if (response.data.success && response.data.token) {
+      if (response.success && response.token) {
         showToast("Sign in successful! Redirecting...", "success");
-        localStorage.setItem('adminToken', response.data.token);
-        localStorage.setItem('adminEmail', response.data.email);
+        localStorage.setItem('adminToken', response.token);
+        localStorage.setItem('adminEmail', response.email);
         setTimeout(() => {
           router.push("/dashboard");
         }, 500);
       } else {
-        throw new Error(response.data.message || 'Sign in failed');
+        throw new Error(response.message || 'Sign in failed');
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'Sign in failed. Please try again.';
+      const errorMessage = error.data?.message || error.message || 'Sign in failed. Please try again.';
       
       showToast(errorMessage, "error");
       
@@ -141,10 +136,10 @@ const SignIn = () => {
 
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isSigningIn}
               className="w-[355px] lg:w-[400px] mx-auto bg-green-900 cursor-pointer text-white py-2 rounded-full hover:bg-green-900 transition duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? 'Signing In...' : 'Sign In'} <span><FaArrowRightFromBracket />
+              {isSubmitting || isSigningIn ? 'Signing In...' : 'Sign In'} <span><FaArrowRightFromBracket />
               </span>
             </button>
           </Form>

@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB in bytes
+const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // 2GB in bytes
 
 export const educationalVideoSchema = Yup.object().shape({
   title: Yup.string()
@@ -21,7 +21,7 @@ export const educationalVideoSchema = Yup.object().shape({
           if (!value) return true;
           return value.type.startsWith('video/');
         })
-        .test('fileSize', 'Video file size must be less than 500MB', (value) => {
+        .test('fileSize', 'Video file size must be less than 2GB', (value) => {
           if (!value) return true;
           return value.size <= MAX_FILE_SIZE;
         })

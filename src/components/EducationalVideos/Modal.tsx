@@ -21,7 +21,7 @@ const Modal: React.FC<ModalProps> = ({
     onSubmit,
     isLoading = false
 }) => {
-    const MAX_FILE_SIZE = 500 * 1024 * 1024;
+    const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // 2GB
 
     if (!isOpen) return null;
 
@@ -36,7 +36,7 @@ const Modal: React.FC<ModalProps> = ({
             const file = values.videos[0];
             if (file.size > MAX_FILE_SIZE) {
                 if (setErrors) {
-                    setErrors({ videos: "Video file size must be less than 500MB" });
+                    setErrors({ videos: "Video file size must be less than 2GB" });
                 }
                 return;
             }
@@ -54,7 +54,7 @@ const Modal: React.FC<ModalProps> = ({
 
     return (
         <div className="fixed inset-0 bg-[#BABBBB]/40 bg-opacity-50 flex items-center justify-center z-30">
-            <div className="bg-white rounded-lg px-4 py-3 w-full max-w-2xl relative max-h-[35rem] overflow-y-auto">
+            <div className="bg-white rounded-lg px-4 py-3 w-full max-w-2xl relative max-h-140 overflow-y-auto">
                 <div onClick={onClose} className="cursor-pointer absolute right-3 top-3 text-[24px] text-[#1C274C] hover:text-[#11401C]">
                     <IoIosCloseCircleOutline />
                 </div>
@@ -96,7 +96,7 @@ const Modal: React.FC<ModalProps> = ({
                                                                     name="description"
                                                                     placeholder={field.placeholder}
                                                                     rows={3}
-                                                                    className={`border border-[#8E8E8E] rounded-2xl py-2 focus-within:ring-1 focus-within:ring-[#11401C] focus-within:border-[#11401C] transition-all px-3 w-full placeholder:text-[#B1A9A9] outline-none text-[#222222] ${
+                                                                    className={`border border-[#8E8E8E] rounded-2xl py-2 focus-within:ring-1 focus-within:ring-[#11401C] focus-within:border-[#11401C] transition-all px-3 w-full placeholder:text-[#B1A9A9] outline-none text-black-100 ${
                                                                         errors.description && touched.description ? 'border-red-500' : ''
                                                                     }`}
                                                                 />
@@ -167,7 +167,7 @@ const Modal: React.FC<ModalProps> = ({
                                                                             <p className="text-[#6D6D6D] font-semibold underline">upload Video</p>
                                                                             <div className="flex items-center justify-center gap-1 mt-1 text-[#6D6D6D]">
                                                                                 <p className="font-bold text-[12px]">MP4</p>
-                                                                                <p className="font-normal text-[14px]">(Max size 500MBs, Max Length 6 minutes)</p>
+                                                                                <p className="font-normal text-[14px]">(Max size 2GB, Max Length 6 minutes)</p>
                                                                             </div>
                                                                             <button 
                                                                                 type="button"
@@ -233,7 +233,7 @@ const Modal: React.FC<ModalProps> = ({
                                                                     name="title"
                                                                     type="text"
                                                                     placeholder={field.placeholder}
-                                                                    className={`border border-[#8E8E8E] rounded-full focus-within:ring-1 focus-within:ring-[#11401C] focus-within:border-[#11401C] transition-all px-3 h-[40px] w-full flex items-center gap-2 outline-none text-[#222222] placeholder:text-[#B1A9A9] ${
+                                                                    className={`border border-[#8E8E8E] rounded-full focus-within:ring-1 focus-within:ring-[#11401C] focus-within:border-[#11401C] transition-all px-3 h-[40px] w-full flex items-center gap-2 outline-none text-black-100 placeholder:text-[#B1A9A9] ${
                                                                         errors.title && touched.title ? 'border-red-500' : ''
                                                                     }`}
                                                                 />
