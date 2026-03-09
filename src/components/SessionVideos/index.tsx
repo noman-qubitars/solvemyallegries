@@ -20,7 +20,7 @@ import {
   SessionVideo
 } from "@/lib/api/sessionVideoApi";
 import { useToaster } from "@/components/Toaster";
-import { splitFileIntoChunks, uploadChunks } from "@/lib/utils/chunkedUpload";
+import { splitFileIntoChunks, uploadChunksParallel } from "@/lib/utils/chunkedUpload";
 
 const SessionVideos: React.FC = () => {
   const { showToast } = useToaster();
@@ -103,9 +103,9 @@ const SessionVideos: React.FC = () => {
 
           const { uploadId, key, presignedUrls } = initiateResponse.data;
 
-          // Step 2: Split file into chunks and upload
+          // Step 2: Split file into chunks and upload (parallel for speed)
           const chunks = splitFileIntoChunks(videoFile);
-          const parts = await uploadChunks(
+          const parts = await uploadChunksParallel(
             chunks,
             presignedUrls
           );
@@ -148,9 +148,9 @@ const SessionVideos: React.FC = () => {
 
         const { uploadId, key, presignedUrls } = initiateResponse.data;
 
-        // Step 2: Split file into chunks and upload
+        // Step 2: Split file into chunks and upload (parallel for speed)
         const chunks = splitFileIntoChunks(videoFile);
-        const parts = await uploadChunks(
+        const parts = await uploadChunksParallel(
           chunks,
           presignedUrls
         );

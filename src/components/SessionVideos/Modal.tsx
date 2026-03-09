@@ -25,6 +25,7 @@ const Modal: React.FC<ModalProps> = ({
     isLoading = false
 }) => {
     const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // 2GB
+    const [activeAction, setActiveAction] = useState<"upload" | "draft" | null>(null);
 
     if (!isOpen) return null;
 
@@ -58,7 +59,7 @@ const Modal: React.FC<ModalProps> = ({
 
     return (
         <div className="fixed inset-0 bg-[#BABBBB]/40 bg-opacity-50 flex items-center justify-center z-30">
-            <div className="bg-white rounded-lg px-4 py-3 w-full max-w-2xl relative max-h-[42.7rem] overflow-y-auto scrollbar-hide">
+            <div className="bg-white rounded-lg px-4 py-3 w-full max-w-2xl relative max-h-148 overflow-y-auto scrollbar-hide">
                 <div onClick={onClose} className="cursor-pointer absolute right-3 top-3 text-[24px] text-[#1C274C] hover:text-[#11401C]">
                     <IoIosCloseCircleOutline />
                 </div>
@@ -69,9 +70,11 @@ const Modal: React.FC<ModalProps> = ({
                     enableReinitialize={true}
                     onSubmit={async (values, { setErrors, setSubmitting }) => {
                         setSubmitting(true);
+                        setActiveAction("upload");
                         try {
                             await handleFormSubmit(values, false, setErrors);
                         } finally {
+                            setActiveAction(null);
                             setSubmitting(false);
                         }
                     }}
@@ -296,7 +299,9 @@ const Modal: React.FC<ModalProps> = ({
                                         disabled={isLoading || isSubmitting}
                                         className="rounded-full px-[24px] py-[8px] bg-transparent border border-[#11401C] text-[#11401C] cursor-pointer font-semibold text-center text-[14px] disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        {isLoading || isSubmitting ? (editingVideo ? "Updating..." : "Uploading...") : (editingVideo ? "Update" : "Upload")}
+                                        {activeAction === "upload" && (isLoading || isSubmitting)
+                                            ? (editingVideo ? "Updating..." : "Uploading...")
+                                            : (editingVideo ? "Update" : "Upload")}
                                     </button>
                                     <button 
                                         type="button"
@@ -305,6 +310,7 @@ const Modal: React.FC<ModalProps> = ({
                                             if (isSubmitting || isLoading) return;
                                             
                                             setSubmitting(true);
+                                            setActiveAction("draft");
                                             try {
                                                 // Validate form first
                                                 const validationErrors = await validateForm();
@@ -339,13 +345,16 @@ const Modal: React.FC<ModalProps> = ({
                                                 
                                                 await handleFormSubmit(values, true, setErrors);
                                             } finally {
+                                                setActiveAction(null);
                                                 setSubmitting(false);
                                             }
                                         }}
                                         disabled={isLoading || isSubmitting}
                                         className="rounded-full px-[24px] py-[8px] bg-transparent border border-[#859B5B] text-[#859B5B] text-center cursor-pointer font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        {isLoading || isSubmitting ? (editingVideo ? "Updating..." : "Saving...") : (editingVideo ? "Update Draft" : "Save Draft")}
+                                        {activeAction === "draft" && (isLoading || isSubmitting)
+                                            ? (editingVideo ? "Updating Draft..." : "Drafting...")
+                                            : (editingVideo ? "Update Draft" : "Save Draft")}
                                     </button>
                                 </div>
                             </Form>

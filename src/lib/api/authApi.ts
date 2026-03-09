@@ -27,16 +27,26 @@ const baseQuery = fetchBaseQuery({
 });
 
 const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
-  let result = await baseQuery(args, api, extraOptions);
-  
-  if (result.error && result.error.status === 401) {
+  const result = await baseQuery(args, api, extraOptions);
+
+  // Only perform automatic sign-out / redirect for authenticated requests,
+  // not for the initial sign-in mutation where we want to show error toasts.
+  const hasStoredToken = typeof window !== 'undefined' && (getAdminToken() || getUserToken());
+
+  const isSignInRequest =
+    typeof args === 'object' &&
+    args !== null &&
+    'url' in args &&
+    (args as { url?: string }).url === '/api/v1/auth/signin';
+
+  if (result.error && result.error.status === 401 && hasStoredToken && !isSignInRequest) {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('adminToken');
       localStorage.removeItem('token');
       window.location.href = '/signin';
     }
   }
-  
+
   return result;
 };
 

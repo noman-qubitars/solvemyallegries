@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { HiOutlineDotsVertical } from "react-icons/hi";
+import { MdOutlineKeyboardDoubleArrowLeft, MdKeyboardArrowLeft, MdOutlineKeyboardDoubleArrowRight, MdKeyboardArrowRight } from "react-icons/md";
 import { EducationalOptionsBtnData } from "@/data/EducationalVideo";
 import { CiStopwatch } from "react-icons/ci";
 import { SessionVideo } from "@/lib/api/sessionVideoApi";
@@ -17,7 +18,12 @@ type DraftsProps = {
 
 const Drafts: React.FC<DraftsProps> = ({ drafts, onEdit, onDelete, searchTerm, onSelectCard }) => {
     const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const dropdownRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+    const ITEMS_PER_PAGE = 10;
+    const itemsPerPageOptions = [10, 20, 30, 50];
 
     const toggleDropdown = (index: number) => {
         setOpenDropdownIndex(prev => (prev === index ? null : index));
@@ -52,23 +58,55 @@ const Drafts: React.FC<DraftsProps> = ({ drafts, onEdit, onDelete, searchTerm, o
         draft.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const pageSize = itemsPerPage || ITEMS_PER_PAGE;
+    const totalPages = Math.max(1, Math.ceil(filteredDrafts.length / pageSize));
+
+    useEffect(() => {
+        // Reset to first page when search term changes
+        setCurrentPage(1);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        // Ensure current page is within bounds when data size changes
+        if (currentPage > totalPages) {
+            setCurrentPage(totalPages);
+        }
+    }, [currentPage, totalPages]);
+
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
+
+    const startIndex = (currentPage - 1) * pageSize;
+    const paginatedDrafts = filteredDrafts.slice(startIndex, startIndex + pageSize);
 
     return (
         <div className="mt-[40px]">
             {filteredDrafts.length === 0 ? (
                 <p className="text-[#11401C] font-semibold text-center">No Drafts Video Available.</p>
             ) : (
+                <>
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                    {filteredDrafts.map((draft, cardIndex) => (
+                    {paginatedDrafts.map((draft, localIndex) => {
+                        const cardIndex = startIndex + localIndex;
+                        return (
                         <div key={draft._id} className="border border-[#B1A9A9] rounded-lg cursor-pointer flex flex-col" onClick={() => onSelectCard(cardIndex)}>
                             <div className="relative">
-                                <video
-                                    src={`${apiUrl}${draft.videoUrl}`}
-                                    className="w-full h-[169px] rounded-tl-lg rounded-tr-lg object-cover"
-                                    preload="metadata"
-                                />
+                                {draft.thumbnailUrl ? (
+                                    <Image
+                                        src={draft.thumbnailUrl}
+                                        alt={draft.title}
+                                        width={300}
+                                        height={169}
+                                        className="w-full h-[169px] rounded-tl-lg rounded-tr-lg object-cover"
+                                        unoptimized
+                                    />
+                                ) : (
+                                    <video
+                                        src={draft.videoUrl.startsWith('http') ? draft.videoUrl : `${apiUrl}${draft.videoUrl}`}
+                                        className="w-full h-[169px] rounded-tl-lg rounded-tr-lg object-cover"
+                                        preload="metadata"
+                                    />
+                                )}
                                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                     <Image src="/images/Educational/play.svg" alt="play" width={26} height={26} />
                                 </div>
@@ -134,8 +172,69 @@ const Drafts: React.FC<DraftsProps> = ({ drafts, onEdit, onDelete, searchTerm, o
                                 </div>
                             </div>
                         </div>
-                    ))}
+                    )})}
                 </div>
+                {filteredDrafts.length > ITEMS_PER_PAGE && (
+                    <div className="flex flex-wrap md:flex-nowrap items-center justify-between mt-3 gap-4 px-[8px]">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <div className="text-[#484C52] font-medium text-[14px] border-r border-[#CCCCCC] pr-4">
+                                Items per page
+                                <select
+                                    className="ml-2 px-2 py-1 border border-[#E9E9E9] rounded-lg outline-none cursor-pointer"
+                                    value={pageSize}
+                                    onChange={(e) => {
+                                        const value = Number(e.target.value);
+                                        setItemsPerPage(value);
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    {itemsPerPageOptions.map((option) => (
+                                        <option key={option} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="text-[#313131] text-[14px] font-normal">
+                                {startIndex + 1} - {Math.min(startIndex + pageSize, filteredDrafts.length)} of {filteredDrafts.length} items
+                            </div>
+                        </div>
+                        <div className="flex flex-wrap justify-center items-center gap-2">
+                            <div className="text-[#313131] text-[14px] font-normal border-r border-[#A6A6A6] pr-3">
+                                {currentPage} of {totalPages} pages
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setCurrentPage(1)}
+                                className="border border-[#E9E9E9] w-[40px] h-[36px] flex items-center justify-center cursor-pointer rounded-[4px] text-[#626262]"
+                            >
+                                <MdOutlineKeyboardDoubleArrowLeft />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                                className="border border-[#E9E9E9] w-[40px] h-[36px] flex items-center justify-center cursor-pointer rounded-[4px] text-[#626262]"
+                            >
+                                <MdKeyboardArrowLeft />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                                className="border border-[#E9E9E9] w-[40px] h-[36px] flex items-center justify-center cursor-pointer rounded-[4px] text-[#626262]"
+                            >
+                                <MdKeyboardArrowRight />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setCurrentPage(totalPages)}
+                                className="border border-[#E9E9E9] w-[40px] h-[36px] flex items-center justify-center cursor-pointer rounded-[4px] text-[#626262]"
+                            >
+                                <MdOutlineKeyboardDoubleArrowRight />
+                            </button>
+                        </div>
+                    </div>
+                )}
+                </>
             )}
         </div>
     );

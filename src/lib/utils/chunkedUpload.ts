@@ -64,7 +64,8 @@ export const uploadChunk = async (
 };
 
 /**
- * Uploads all chunks to S3
+ * Uploads all chunks to S3 sequentially
+ * (kept for compatibility, but for large files prefer uploadChunksParallel)
  */
 export const uploadChunks = async (
   chunks: Blob[],
@@ -80,7 +81,6 @@ export const uploadChunks = async (
       etag: etag,
     });
 
-    // Report progress
     if (onProgress) {
       const progress = ((i + 1) / chunks.length) * 100;
       onProgress(progress);
@@ -88,5 +88,55 @@ export const uploadChunks = async (
   }
 
   return parts;
+};
+
+/**
+ * Uploads chunks to S3 in parallel with a concurrency limit.
+ * This dramatically reduces total upload time for large videos.
+ */
+export const uploadChunksParallel = async (
+  chunks: Blob[],
+  presignedUrls: string[],
+  onProgress?: (progress: number) => void,
+  concurrency: number = 5
+): Promise<UploadPart[]> => {
+  const total = chunks.length;
+  const results: UploadPart[] = new Array(total);
+  let completed = 0;
+  let currentIndex = 0;
+
+  const runNext = async (): Promise<void> => {
+    const index = currentIndex;
+    if (index >= total) return;
+    currentIndex += 1;
+
+    const etag = await uploadChunk(presignedUrls[index], chunks[index]);
+    results[index] = {
+      partNumber: index + 1,
+      etag,
+    };
+
+    completed += 1;
+    if (onProgress) {
+      const progress = (completed / total) * 100;
+      onProgress(progress);
+    }
+
+    // Start next upload in this worker
+    if (currentIndex < total) {
+      await runNext();
+    }
+  };
+
+  const workers = [];
+  const workerCount = Math.min(concurrency, total);
+  for (let i = 0; i < workerCount; i++) {
+    workers.push(runNext());
+  }
+
+  await Promise.all(workers);
+
+  // Ensure parts are ordered by partNumber
+  return results.slice().sort((a, b) => a.partNumber - b.partNumber);
 };
 
